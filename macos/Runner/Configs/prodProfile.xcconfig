@@ -1,0 +1,8 @@
+#include "../../Flutter/prodProfile.xcconfig"
+#include "Warnings.xcconfig"
+
+ASSET_PREFIX=prod
+BUNDLE_NAME=Beacon
+BUNDLE_DISPLAY_NAME=Beacon
+FLUTTER_TARGET=lib/main_prod.dart
+CODE_SIGN_ENTITLEMENTS=Runner/Release.entitlements

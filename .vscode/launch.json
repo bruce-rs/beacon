@@ -1,0 +1,21 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Beacon (DEV)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main_dev.dart",
+      "flutterMode": "debug",
+      "args": ["--flavor", "dev", "-t", "lib/main_dev.dart"]
+    },
+    {
+      "name": "Beacon (PROD)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main_prod.dart",
+      "flutterMode": "debug",
+      "args": ["--flavor", "prod", "-t", "lib/main_prod.dart"]
+    }
+  ]
+}

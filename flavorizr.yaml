@@ -1,0 +1,55 @@
+flavors:
+  dev:
+    app:
+      name: "Beacon (Dev)"
+
+    android:
+      applicationId: "pub.brs.flbeacon.dev"
+    ios:
+      bundleId: "pub.brs.flbeacon.dev"
+    macos:
+      bundleId: "pub.brs.flbeacon.dev"
+      variables:
+        FLUTTER_TARGET:
+          value: "lib/main_dev.dart"
+
+  prod:
+    app:
+      name: "Beacon"
+
+    android:
+      applicationId: "pub.brs.flbeacon"
+    ios:
+      bundleId: "pub.brs.flbeacon"
+    macos:
+      bundleId: "pub.brs.flbeacon"
+      variables:
+        FLUTTER_TARGET:
+          value: "lib/main_prod.dart"
+
+instructions:
+  - assets:download
+  - assets:extract
+  - android:flavorizrGradle
+  - android:buildGradle
+  - android:androidManifest
+  - android:dummyAssets
+  - android:icons
+  - ios:xcconfig
+  - ios:buildTargets
+  - ios:schema
+  - ios:plist
+  - ios:icons
+  - ios:dummyAssets
+  - macos:xcconfig
+  - macos:configs
+  - macos:buildTargets
+  - macos:schema
+  - macos:plist
+  - macos:icons
+  - macos:dummyAssets
+  - flutter:flavors
+  - assets:clean
+
+# Run the following command to generate the flavors:
+# dart run flutter_flavorizr

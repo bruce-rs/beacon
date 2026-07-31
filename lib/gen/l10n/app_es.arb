@@ -1,0 +1,64 @@
+{
+  "@@locale": "es",
+  "app_name": "Beacon",
+  "settings": "Ajustes",
+  "nearby_devices": "Dispositivos cercanos",
+  "searching_devices": "Buscando dispositivos en tu red…",
+  "transfers": "Transferencias",
+  "drop_zone_select_device": "Selecciona un dispositivo arriba para enviar archivos",
+  "drop_zone_tap_to_pick": "Toca para elegir archivos\ny enviar a {name}",
+  "@drop_zone_tap_to_pick": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "drop_zone_release_to_send": "Suelta para enviar a {name}",
+  "@drop_zone_release_to_send": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "drop_zone_drop_files": "Arrastra archivos aquí\npara enviar a {name}",
+  "@drop_zone_drop_files": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "status": "Estado",
+  "status_running": "En línea",
+  "status_starting": "Iniciando…",
+  "status_stopped": "Desconectado",
+  "status_error": "Error",
+  "open_folder": "Abrir carpeta",
+  "open_folder_failed": "No se pudo abrir la carpeta",
+  "appearance": "Apariencia",
+  "theme_system": "Predeterminado del sistema",
+  "theme_light": "Claro",
+  "theme_dark": "Oscuro",
+  "language": "Idioma",
+  "lang_en": "Inglés",
+  "lang_es": "Español",
+  "oops_you_should_not_be_here": "Oops! No deberías estar aquí. Vamos a donde empezamos.",
+  "go_home": "Ir a inicio",
+  "unknown_page": "Página desconocida",
+  "privacy_policy": "Política de privacidad",
+  "privacy_policy_subtitle": "Cómo tratamos tus archivos y datos",
+  "privacy_policy_close": "Cerrar",
+  "privacy_policy_intro": "Beacon es una herramienta gratuita que te permite compartir archivos entre tus propios dispositivos en la misma red local. Lee los siguientes puntos antes de usar la aplicación.",
+  "privacy_policy_file_sharing_title": "Solo compartimos archivos",
+  "privacy_policy_file_sharing_body": "La aplicación se limita a transferir los archivos que tú decides enviar. No se envía nada en segundo plano ni se sube a ningún servidor.",
+  "privacy_policy_liability_title": "Los riesgos de red siempre están presentes",
+  "privacy_policy_liability_body": "Esta aplicación no modifica ni daña tus archivos. Sin embargo, como las transferencias dependen de tu red local, siempre existen ciertos riesgos que están fuera de nuestro control. Te recomendamos mantener tus propias copias de seguridad de los archivos importantes.",
+  "privacy_policy_free_title": "Completamente gratis",
+  "privacy_policy_free_body": "La aplicación es totalmente gratis. No hay compras, suscripciones ni anuncios.",
+  "privacy_policy_no_tracking_title": "Sin seguimiento",
+  "privacy_policy_no_tracking_body": "No recopilamos, rastreamos ni compartimos ningún dato personal, analítica ni información de uso.",
+  "privacy_policy_no_storage_title": "No guardamos tus archivos",
+  "privacy_policy_no_storage_body": "No almacenamos tus archivos. Las transferencias van directamente entre tus dispositivos en la red local; nosotros no conservamos ninguna copia."
+}

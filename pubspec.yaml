@@ -1,0 +1,73 @@
+name: beacon
+description: "Share your files with your other devices."
+publish_to: "none"
+version: 1.0.2+111
+
+environment:
+  sdk: ^3.11.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  collection: any
+  objective_c: 9.1.0
+
+  path: any
+  sqflite: ^2.4.2
+  auto_route: ^11.1.0
+  flutter_dotenv: ^6.0.0
+  google_fonts: ^8.0.2
+  json_annotation: ^4.11.0
+  shared_preferences: ^2.5.5
+  get_it: ^9.2.1
+  injectable: ^2.7.1+4
+  get: ^4.7.3
+
+  nsd: ^5.0.1
+  desktop_drop: ^0.4.4
+  path_provider: ^2.1.5
+  file_picker: ^11.0.2
+  media_store_plus: ^0.1.3
+  device_info_plus: ^12.2.0
+  url_launcher: ^6.3.2
+
+  sdk_helpers: ^1.0.0
+  networking: ^0.0.1
+  widget_hub: ^1.0.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+  build_runner: ^2.13.1
+  flutter_flavorizr: ^2.4.2
+  auto_route_generator: ^10.5.0
+  json_serializable: ^6.13.1
+  injectable_generator: ^2.12.1
+
+dependency_overrides:
+  sdk_helpers:
+    git:
+      url: https://github.com/Brandon-RS/dart_packages.git
+      path: packages/sdk_helpers
+
+  networking:
+    git:
+      url: https://github.com/Brandon-RS/dart_packages.git
+      path: packages/networking
+
+  widget_hub:
+    git:
+      url: https://github.com/Brandon-RS/dart_packages.git
+      path: packages/widget_hub
+
+flutter:
+  generate: true
+  uses-material-design: true
+  assets:
+    - assets/env/
