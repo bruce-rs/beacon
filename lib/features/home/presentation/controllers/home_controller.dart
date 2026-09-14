@@ -134,10 +134,10 @@ class HomeController extends BaseController with WidgetsBindingObserver {
       return;
     }
 
-    final result = await FilePicker.pickFiles(allowMultiple: true);
-    if (result == null) return;
+    final files = await FilePicker.pickFiles();
+    if (files.isEmpty) return;
 
-    final paths = result.files.map((f) => f.path).whereType<String>().toList();
+    final paths = files.map((f) => f.path).whereType<String>().toList();
     await sendFiles(paths);
   }
 }

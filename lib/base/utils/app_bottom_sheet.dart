@@ -19,7 +19,11 @@ Future<T?> showAdaptiveBottomSheet<T>({
     return await showCupertinoSheet<T>(
       context: context,
       enableDrag: isDismissible,
-      builder: (context) => Material(color: backgroundColor ?? context.colors.surface, child: builder(context)),
+      scrollableBuilder: (BuildContext context, ScrollController controller) {
+        Widget widgetBuilder(BuildContext context) =>
+            Material(color: backgroundColor ?? context.colors.surface, child: builder(context));
+        return widgetBuilder(context);
+      },
     );
   }
 

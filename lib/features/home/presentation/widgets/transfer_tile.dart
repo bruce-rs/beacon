@@ -17,6 +17,8 @@ class TransferTile extends StatelessWidget {
     await showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
+      isScrollControlled: true,
+      constraints: const BoxConstraints(minHeight: 600),
       builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,

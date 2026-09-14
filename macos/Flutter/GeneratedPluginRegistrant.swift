@@ -7,7 +7,7 @@ import Foundation
 
 import desktop_drop
 import device_info_plus
-import file_picker
+import file_picker_darwin
 import nsd_macos
 import path_provider_foundation
 import shared_preferences_foundation

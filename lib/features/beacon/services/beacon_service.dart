@@ -7,6 +7,7 @@ import 'package:beacon/base/utils/env.dart';
 import 'package:beacon/features/beacon/data/models/beacon_device.dart';
 import 'package:beacon/features/beacon/data/models/file_transfer.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:injectable/injectable.dart';
 import 'package:media_store_plus/media_store_plus.dart';
 import 'package:nsd/nsd.dart' as nsd;
@@ -41,6 +42,7 @@ class BeaconService with LoggerMixin {
   String _nextId() => '${DateTime.now().millisecondsSinceEpoch}_${_idCounter++}';
 
   final _mediaStore = MediaStore();
+  static const _filesChannel = MethodChannel('com.beacon/files');
   bool _mediaStoreReady = false;
 
   Future<void> _ensureMediaStore() async {
@@ -476,9 +478,9 @@ class BeaconService with LoggerMixin {
   ///
   /// - iOS: opens Files.app at the app's Documents/Beacon folder (requires
   ///   `UIFileSharingEnabled` + `LSSupportsOpeningDocumentsInPlace`).
-  /// - Android: opens the MediaStore entry for the received file (system
-  ///   file viewer), since opening the Downloads folder directly requires
-  ///   a platform channel.
+  /// - Android: opens Download/Beacon in the system Files app via a platform
+  ///   channel (see MainActivity.kt), falling back to the MediaStore entry
+  ///   for the received file.
   /// - Desktop: opens the save folder in the OS file manager.
   Future<bool> openSaveLocation(FileTransfer transfer) async {
     try {
@@ -488,6 +490,8 @@ class BeaconService with LoggerMixin {
         return await launchUrl(uri);
       }
       if (Platform.isAndroid) {
+        final opened = await _filesChannel.invokeMethod<bool>('openDownloadsFolder', {'folder': Env.folderName});
+        if (opened == true) return true;
         if (transfer.savedUri == null) return false;
         return await launchUrl(Uri.parse(transfer.savedUri!), mode: LaunchMode.externalApplication);
       }

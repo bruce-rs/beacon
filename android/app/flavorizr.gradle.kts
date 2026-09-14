@@ -8,13 +8,15 @@ android.apply {
     productFlavors {
         create("dev") {
             dimension = "flavor-type"
-            applicationId = "pub.brs.beacon.dev"
+            applicationId = "pub.brs.flbeacon.dev"
             resValue(type = "string", name = "app_name", value = "Beacon (Dev)")
         }
         create("prod") {
             dimension = "flavor-type"
-            applicationId = "pub.brs.beacon"
+            applicationId = "pub.brs.flbeacon"
             resValue(type = "string", name = "app_name", value = "Beacon")
         }
     }
+
+    buildFeatures.resValues = true
 }
