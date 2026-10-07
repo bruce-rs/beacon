@@ -28,7 +28,7 @@ class HomeController extends BaseController with WidgetsBindingObserver {
   void onInit() {
     super.onInit();
     WidgetsBinding.instance.addObserver(this);
-    _beacon.devicesStream.listen((list) => devices.assignAll(list));
+    _beacon.devicesStream.listen(_onDevices);
     _beacon.transferStream.listen(_onTransfer);
     _beacon.statusStream.listen((s) => status.value = s);
     _startBeacon();
@@ -47,7 +47,11 @@ class HomeController extends BaseController with WidgetsBindingObserver {
   void didChangeAppLifecycleState(AppLifecycleState state) {
     // Only restart after a real background → foreground transition; the
     // initial `resumed` event on launch would otherwise race with onInit.
-    if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
+    if (state == AppLifecycleState.detached) {
+      // Leaving a live registration behind makes the next launch collide with
+      // it and get renamed ("name (2)").
+      _beacon.stop();
+    } else if (state == AppLifecycleState.paused || state == AppLifecycleState.hidden) {
       _wasPaused = true;
     } else if (state == AppLifecycleState.resumed && _wasPaused) {
       _wasPaused = false;
@@ -57,44 +61,96 @@ class HomeController extends BaseController with WidgetsBindingObserver {
 
   Future<void> _startBeacon() async {
     try {
-      await _beacon.start(await _localName);
+      await _beacon.start(await _localName, deviceId: await _stableDeviceId);
     } catch (err) {
       showError('Beacon failed to start: $err');
     }
   }
 
+  /// A human-readable name for this device, advertised over mDNS.
+  ///
+  /// Platform sources, best first:
+  /// - Android: `Settings.Global.DEVICE_NAME` (the name the user set).
+  /// - iOS: the user-assigned name; iOS 16+ returns a generic "iPhone" unless
+  ///   the app has the user-assigned-device-name entitlement, so fall back to
+  ///   the marketing model name ("iPhone 16 Pro").
+  /// - macOS/Windows: the computer name.
+  /// - Otherwise: the hostname.
+  ///
+  /// Names need not be unique; mDNS appends a suffix when two collide.
   Future<String> get _localName async {
-    String name = Platform.localHostname;
-    if (name.endsWith('.local')) name = name.substring(0, name.length - 6);
-    // iOS often returns 'localhost' or empty — fall back to a friendly label.
-    if (name.isEmpty || name == 'localhost') {
-      name = 'Beacon-${Platform.operatingSystem}';
-    }
-    // Append a stable per-device id so two devices with the same label
-    // (e.g. both iOS) don't collide and get auto-renamed by mDNS.
-    final id = await _platformDeviceId();
-    return id != null ? '$name-$id' : name;
-  }
-
-  Future<String?> _platformDeviceId() async {
     final info = DeviceInfoPlugin();
     try {
-      if (Platform.isIOS) return _shorten((await info.iosInfo).identifierForVendor);
-      if (Platform.isAndroid) return _shorten((await info.androidInfo).id);
-      if (Platform.isMacOS) return _shorten((await info.macOsInfo).systemGUID);
-      if (Platform.isWindows) return _shorten((await info.windowsInfo).deviceId);
-      if (Platform.isLinux) return _shorten((await info.linuxInfo).machineId);
+      if (Platform.isAndroid) {
+        final android = await info.androidInfo;
+        return _pick([android.name, '${android.manufacturer} ${android.model}']);
+      }
+      if (Platform.isIOS) {
+        final ios = await info.iosInfo;
+        // "iPhone"/"iPad" means iOS withheld the user-assigned name.
+        final isGeneric = const {'iphone', 'ipad', 'ipod touch'}.contains(ios.name.trim().toLowerCase());
+        return isGeneric ? _pick([ios.modelName, ios.name]) : _pick([ios.name, ios.modelName]);
+      }
+      if (Platform.isMacOS) return _pick([(await info.macOsInfo).computerName, _hostname]);
+      if (Platform.isWindows) return _pick([(await info.windowsInfo).computerName, _hostname]);
+    } catch (err) {
+      w('Failed to read device name: $err');
+    }
+    return _hostname;
+  }
+
+  /// A stable per-install id, advertised so peers recognise this device across
+  /// relaunches regardless of the mDNS instance name.
+  Future<String?> get _stableDeviceId async {
+    final info = DeviceInfoPlugin();
+    try {
+      if (Platform.isIOS) return (await info.iosInfo).identifierForVendor;
+      if (Platform.isAndroid) return (await info.androidInfo).id;
+      if (Platform.isMacOS) return (await info.macOsInfo).systemGUID;
+      if (Platform.isWindows) return (await info.windowsInfo).deviceId;
+      if (Platform.isLinux) return (await info.linuxInfo).machineId;
     } catch (err) {
       w('Failed to read device id: $err');
     }
     return null;
   }
 
-  String? _shorten(String? raw) {
-    if (raw == null || raw.isEmpty) return null;
-    final cleaned = raw.replaceAll(RegExp(r'[^A-Za-z0-9]'), '').toLowerCase();
-    if (cleaned.isEmpty) return null;
-    return cleaned.substring(0, cleaned.length.clamp(0, 8));
+  String get _hostname {
+    String name = Platform.localHostname;
+    if (name.endsWith('.local')) name = name.substring(0, name.length - 6);
+    if (name.isEmpty || name == 'localhost') name = 'Beacon-${Platform.operatingSystem}';
+    return name;
+  }
+
+  /// First non-blank candidate, or a platform-tagged fallback.
+  String _pick(List<String?> candidates) {
+    for (final candidate in candidates) {
+      final trimmed = candidate?.trim();
+      if (trimmed != null && trimmed.isNotEmpty) return trimmed;
+    }
+    return 'Beacon-${Platform.operatingSystem}';
+  }
+
+  void _onDevices(List<BeaconDevice> list) {
+    devices.assignAll(list);
+
+    // A selected device that left the network would otherwise stay highlighted
+    // and be sent to. Drop the selection; the user can pick it again when it
+    // comes back (possibly on a new port, hence the lookup in `_liveSelection`).
+    final selected = selectedDevice.value;
+    if (selected != null && !list.any((d) => d.id == selected.id)) {
+      selectedDevice.value = null;
+    }
+  }
+
+  /// The selected device as currently advertised, or null if it is gone.
+  ///
+  /// Re-announcements can change host/port, and [BeaconDevice] equality is
+  /// id-based, so the stored selection can hold a stale endpoint.
+  BeaconDevice? get _liveSelection {
+    final selected = selectedDevice.value;
+    if (selected == null) return null;
+    return devices.firstWhereOrNull((d) => d.id == selected.id) ?? selected;
   }
 
   void _onTransfer(FileTransfer t) {
@@ -115,7 +171,7 @@ class HomeController extends BaseController with WidgetsBindingObserver {
   }
 
   Future<void> sendFiles(List<String> paths) async {
-    final device = selectedDevice.value;
+    final device = _liveSelection;
     if (device == null) {
       showError('Select a device first');
       return;
@@ -128,7 +184,7 @@ class HomeController extends BaseController with WidgetsBindingObserver {
   Future<bool> openTransferLocation(FileTransfer transfer) => _beacon.openSaveLocation(transfer);
 
   Future<void> pickAndSendFiles() async {
-    final device = selectedDevice.value;
+    final device = _liveSelection;
     if (device == null) {
       showError('Select a device first');
       return;

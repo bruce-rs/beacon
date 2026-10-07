@@ -18,6 +18,10 @@ import 'package:url_launcher/url_launcher.dart';
 
 const String _kServiceType = '_beacon._tcp';
 
+/// TXT record keys (max 9 chars per RFC 6763).
+const String _kTxtName = 'n';
+const String _kTxtId = 'id';
+
 enum BeaconStatus { stopped, starting, running, error }
 
 // Wire protocol (both directions keep the same framing):
@@ -37,6 +41,7 @@ class BeaconService with LoggerMixin {
   nsd.Discovery? _discovery;
   nsd.Registration? _registration;
   String? _localServiceName;
+  String? _localDeviceId;
 
   int _idCounter = 0;
   String _nextId() => '${DateTime.now().millisecondsSinceEpoch}_${_idCounter++}';
@@ -76,7 +81,7 @@ class BeaconService with LoggerMixin {
     _statusController.add(next);
   }
 
-  Future<void> start(String deviceName) async {
+  Future<void> start(String deviceName, {String? deviceId}) async {
     // Wait for any in-flight start/stop to settle first.
     await _pending;
     // Idempotent: already running (or mid-start that just finished) → no-op.
@@ -97,7 +102,22 @@ class BeaconService with LoggerMixin {
         });
       });
 
-      _registration = await nsd.register(nsd.Service(name: requested, type: _kServiceType, port: _server!.port));
+      // The instance name can be renamed by mDNS on collision ("name (2)"),
+      // e.g. when a record from a previous launch is still cached. Advertising
+      // the display name and a stable device id in TXT records keeps both the
+      // name shown to users and the device identity free of that suffix.
+      _localDeviceId = deviceId;
+      _registration = await nsd.register(
+        nsd.Service(
+          name: requested,
+          type: _kServiceType,
+          port: _server!.port,
+          txt: {
+            _kTxtName: Uint8List.fromList(utf8.encode(deviceName)),
+            if (deviceId != null) _kTxtId: Uint8List.fromList(utf8.encode(deviceId)),
+          },
+        ),
+      );
       // iOS / mDNS may change the advertised name (collision suffix, escapes).
       // Use what was actually registered so self-filtering works.
       _localServiceName = _registration!.service.name ?? requested;
@@ -171,6 +191,7 @@ class BeaconService with LoggerMixin {
     } catch (_) {}
     _server = null;
     _localServiceName = null;
+    _localDeviceId = null;
     _localAddresses.clear();
     _devices.clear();
     _devicesController.add(const []);
@@ -181,7 +202,29 @@ class BeaconService with LoggerMixin {
   static String _normalize(String name) =>
       name.trim().toLowerCase().replaceAll(RegExp(r'\.local\.?$'), '').replaceAll(RegExp(r'\.$'), '');
 
+  /// Reads a TXT record as UTF-8, or null when absent/undecodable.
+  static String? _txt(nsd.Service service, String key) {
+    final raw = service.txt?[key];
+    if (raw == null || raw.isEmpty) return null;
+    try {
+      final value = utf8.decode(raw).trim();
+      return value.isEmpty ? null : value;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  /// Strips the " (2)" suffix mDNS appends when an instance name is taken.
+  ///
+  /// Only needed for peers that advertise no [_kTxtName] record.
+  @visibleForTesting
+  static String stripCollisionSuffix(String name) => name.replaceFirst(RegExp(r'[\s-]*\(\d+\)$'), '').trim();
+
   bool _isSelf(nsd.Service service) {
+    // Most reliable: our own device id, even if mDNS renamed the instance.
+    final id = _txt(service, _kTxtId);
+    if (id != null && _localDeviceId != null && id == _localDeviceId) return true;
+
     final name = service.name;
     if (name != null && _localServiceName != null && _normalize(name) == _normalize(_localServiceName!)) {
       return true;
@@ -200,7 +243,10 @@ class BeaconService with LoggerMixin {
 
   void _onServiceChanged(nsd.Service service, nsd.ServiceStatus status) {
     if (service.name == null || _isSelf(service)) return;
-    final id = _normalize(service.name!);
+    // Prefer the advertised id/name so a device keeps one identity and a clean
+    // label across relaunches, even when mDNS renames the instance.
+    final id = _txt(service, _kTxtId) ?? _normalize(service.name!);
+    final name = _txt(service, _kTxtName) ?? stripCollisionSuffix(service.name!);
 
     if (status == nsd.ServiceStatus.found) {
       final addresses = service.addresses;
@@ -215,7 +261,7 @@ class BeaconService with LoggerMixin {
         return;
       }
 
-      final device = BeaconDevice(id: id, name: service.name!, host: addr.address, port: service.port!);
+      final device = BeaconDevice(id: id, name: name, host: addr.address, port: service.port!);
 
       final idx = _devices.indexWhere((d) => d.id == device.id);
       if (idx >= 0) {

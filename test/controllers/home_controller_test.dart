@@ -1,3 +1,4 @@
+import 'package:beacon/features/beacon/data/models/beacon_device.dart';
 import 'package:beacon/features/beacon/data/models/file_transfer.dart';
 import 'package:beacon/features/home/presentation/controllers/home_controller.dart';
 import 'package:flutter/material.dart';
@@ -147,6 +148,60 @@ void main() {
       beacon.emitDevices([]);
       await Future<void>.microtask(() {});
       expect(ctrl.devices, isEmpty);
+    });
+
+    test('selection is dropped when the selected device disappears', () async {
+      final a = makeDevice(id: 'a');
+      beacon.emitDevices([a, makeDevice(id: 'b')]);
+      await Future<void>.microtask(() {});
+      ctrl.selectDevice(a);
+
+      beacon.emitDevices([makeDevice(id: 'b')]);
+      await Future<void>.microtask(() {});
+
+      expect(ctrl.selectedDevice.value, isNull);
+    });
+
+    test('selection is kept when another device disappears', () async {
+      final a = makeDevice(id: 'a');
+      beacon.emitDevices([a, makeDevice(id: 'b')]);
+      await Future<void>.microtask(() {});
+      ctrl.selectDevice(a);
+
+      beacon.emitDevices([a]);
+      await Future<void>.microtask(() {});
+
+      expect(ctrl.selectedDevice.value, a);
+    });
+
+    test('device can be selected again after coming back', () async {
+      final a = makeDevice(id: 'a');
+      beacon.emitDevices([a]);
+      await Future<void>.microtask(() {});
+      ctrl.selectDevice(a);
+
+      beacon.emitDevices([]);
+      await Future<void>.microtask(() {});
+      beacon.emitDevices([a]);
+      await Future<void>.microtask(() {});
+
+      expect(ctrl.selectedDevice.value, isNull);
+      ctrl.selectDevice(a);
+      expect(ctrl.selectedDevice.value, a);
+    });
+
+    test('sendFiles uses the re-announced endpoint, not the stale one', () async {
+      beacon.emitDevices([makeDevice(id: 'a')]);
+      await Future<void>.microtask(() {});
+      ctrl.selectDevice(makeDevice(id: 'a'));
+
+      const moved = BeaconDevice(id: 'a', name: 'TestDevice', host: '192.168.1.11', port: 5001);
+      beacon.emitDevices([moved]);
+      await Future<void>.microtask(() {});
+
+      await ctrl.sendFiles(['/tmp/a.txt']);
+      expect(beacon.lastSendDevice?.host, '192.168.1.11');
+      expect(beacon.lastSendDevice?.port, 5001);
     });
   });
 }

@@ -33,8 +33,14 @@ class FakeBeaconService extends BeaconService {
   @override
   List<BeaconDevice> get devices => [];
 
+  String? lastStartName;
+  String? lastStartDeviceId;
+
   @override
-  Future<void> start(String deviceName) async {}
+  Future<void> start(String deviceName, {String? deviceId}) async {
+    lastStartName = deviceName;
+    lastStartDeviceId = deviceId;
+  }
 
   @override
   Future<void> stop() async {}

@@ -7,6 +7,19 @@ InternetAddress _v4(String ip) => InternetAddress(ip, type: InternetAddressType.
 InternetAddress _v6(String ip) => InternetAddress(ip, type: InternetAddressType.IPv6);
 
 void main() {
+  group('stripCollisionSuffix', () {
+    test('strips the suffix mDNS appends on collision', () {
+      expect(BeaconService.stripCollisionSuffix('ios-one (2)'), 'ios-one');
+      expect(BeaconService.stripCollisionSuffix('ios-one (13)'), 'ios-one');
+      expect(BeaconService.stripCollisionSuffix('ios-one-(2)'), 'ios-one');
+    });
+
+    test('leaves plain names untouched', () {
+      expect(BeaconService.stripCollisionSuffix('ios-one'), 'ios-one');
+      expect(BeaconService.stripCollisionSuffix('Pixel 8 (Bruce)'), 'Pixel 8 (Bruce)');
+    });
+  });
+
   group('BeaconService.selectAddress – routable private IPv4', () {
     test('192.168.x.x is selected', () {
       final result = BeaconService.selectAddress([_v4('192.168.1.50')]);
