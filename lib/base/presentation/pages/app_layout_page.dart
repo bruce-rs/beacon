@@ -9,6 +9,10 @@ class AppLayoutPage extends BasePage<AppController> {
 
   static const String routePath = '/';
 
+  // Hosts the nested router; the pages it shows constrain themselves.
   @override
-  Widget build(BuildContext context) => const AutoRouter();
+  bool get constrainWidth => false;
+
+  @override
+  Widget buildPage(BuildContext context) => const AutoRouter();
 }

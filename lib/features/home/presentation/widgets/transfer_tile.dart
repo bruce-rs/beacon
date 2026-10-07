@@ -1,4 +1,5 @@
 import 'package:beacon/base/extensions/context_ext.dart';
+import 'package:beacon/base/utils/app_bottom_sheet.dart';
 import 'package:beacon/features/beacon/data/models/file_transfer.dart';
 import 'package:beacon/features/home/presentation/controllers/home_controller.dart';
 import 'package:flutter/material.dart';
@@ -14,11 +15,10 @@ class TransferTile extends StatelessWidget {
       (transfer.savePath != null || transfer.savedUri != null);
 
   Future<void> _showActions(BuildContext context) async {
-    await showModalBottomSheet<void>(
+    await showAdaptiveBottomSheet<void>(
       context: context,
+      minHeight: 600,
       showDragHandle: true,
-      isScrollControlled: true,
-      constraints: const BoxConstraints(minHeight: 600),
       builder: (sheetContext) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,

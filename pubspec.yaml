@@ -1,7 +1,7 @@
 name: beacon
 description: "Share your files with your other devices."
 publish_to: "none"
-version: 1.0.3+111
+version: 1.0.4+112
 
 environment:
   sdk: ^3.11.1

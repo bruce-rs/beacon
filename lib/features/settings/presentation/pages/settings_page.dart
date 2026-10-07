@@ -17,7 +17,7 @@ class SettingsPage extends BasePage<SettingsController> {
   static const String routePath = 'settings';
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget buildPage(BuildContext context) => Scaffold(
     appBar: AppBar(
       title: Text(context.tr.settings),
       titleTextStyle: context.texts.titleLarge?.copyWith(fontWeight: FontWeight.bold),

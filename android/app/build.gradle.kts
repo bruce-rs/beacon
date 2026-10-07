@@ -47,6 +47,9 @@ android {
 
     buildTypes {
         release {
+            // R8 runs for release builds; see proguard-rules.pro for plugin models
+            // whose field names must survive minification.
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName(if (hasReleaseKeystore) "release" else "debug")
         }
     }

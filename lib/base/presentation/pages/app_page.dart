@@ -1,5 +1,3 @@
-import 'package:beacon/base/constants/constants.dart';
-import 'package:beacon/base/extensions/context_ext.dart';
 import 'package:beacon/base/presentation/controllers/app_controller.dart';
 import 'package:beacon/base/presentation/pages/base_page.dart';
 import 'package:beacon/base/presentation/pages/unknown_page.dart';
@@ -13,8 +11,13 @@ import 'package:get/get.dart';
 class AppPage extends BasePage<AppController> {
   const AppPage({super.key});
 
+  // Sits above MaterialApp: there is no Theme to read yet, and a cap here would
+  // apply to every route and modal.
   @override
-  Widget build(BuildContext context) => Obx(
+  bool get constrainWidth => false;
+
+  @override
+  Widget buildPage(BuildContext context) => Obx(
     () => MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: AppFlavor.title,
@@ -24,18 +27,9 @@ class AppPage extends BasePage<AppController> {
       locale: controller.appLocale.asLocale,
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      builder: (context, child) => ColoredBox(
-        color: context.colors.surface,
-        child: Align(
-          alignment: Alignment.topCenter,
-          child: SafeArea(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: kMediumScreenMaxWidth),
-              child: Builder(builder: (context) => child ?? const UnknownPage()),
-            ),
-          ),
-        ),
-      ),
+      // Pages constrain themselves through BasePage; constraining here would
+      // also cap modal routes, cutting bottom sheets off mid-screen.
+      builder: (context, child) => Builder(builder: (context) => child ?? const UnknownPage()),
       routerConfig: AppRouter.to.config(navigatorObservers: () => [BindingsObserver()]),
     ),
   );

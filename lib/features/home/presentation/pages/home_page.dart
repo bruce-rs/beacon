@@ -17,7 +17,7 @@ class HomePage extends BasePage<HomeController> {
   static const String routePath = 'home';
 
   @override
-  Widget build(BuildContext context) => Scaffold(
+  Widget buildPage(BuildContext context) => Scaffold(
     appBar: AppBar(
       title: Text(context.tr.app_name),
       titleTextStyle: context.texts.titleLarge?.copyWith(fontWeight: FontWeight.bold),
