@@ -6,6 +6,8 @@ class AppColorExtension extends ThemeExtension<AppColorExtension> {
     required this.onSuccess,
     required this.successContainer,
     required this.onSuccessContainer,
+    required this.deviceTeal,
+    required this.deviceViolet,
   });
 
   final Color? success;
@@ -13,18 +15,26 @@ class AppColorExtension extends ThemeExtension<AppColorExtension> {
   final Color? successContainer;
   final Color? onSuccessContainer;
 
+  /// Identity tints for device avatars, picked from the device's advertised id.
+  final Color? deviceTeal;
+  final Color? deviceViolet;
+
   @override
   ThemeExtension<AppColorExtension> copyWith({
     Color? success,
     Color? onSuccess,
     Color? successContainer,
     Color? onSuccessContainer,
+    Color? deviceTeal,
+    Color? deviceViolet,
   }) {
     return AppColorExtension(
       success: success ?? this.success,
       onSuccess: onSuccess ?? this.onSuccess,
       successContainer: successContainer ?? this.successContainer,
       onSuccessContainer: onSuccessContainer ?? this.onSuccessContainer,
+      deviceTeal: deviceTeal ?? this.deviceTeal,
+      deviceViolet: deviceViolet ?? this.deviceViolet,
     );
   }
 
@@ -37,6 +47,8 @@ class AppColorExtension extends ThemeExtension<AppColorExtension> {
       onSuccess: Color.lerp(onSuccess, other.onSuccess, t),
       successContainer: Color.lerp(successContainer, other.successContainer, t),
       onSuccessContainer: Color.lerp(onSuccessContainer, other.onSuccessContainer, t),
+      deviceTeal: Color.lerp(deviceTeal, other.deviceTeal, t),
+      deviceViolet: Color.lerp(deviceViolet, other.deviceViolet, t),
     );
   }
 }

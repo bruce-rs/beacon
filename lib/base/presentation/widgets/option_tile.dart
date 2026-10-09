@@ -37,7 +37,7 @@ class OptionTile extends OptionCardTile {
           Icon(icon, size: kTileIconSize, color: context.colors.onSurfaceVariant),
           const SizedBox(width: kTileIconGap),
           Expanded(child: Text(label, style: context.texts.bodyMedium)),
-          if (isSelected) Icon(Icons.check_rounded, size: kTileIconSize, color: context.colors.onPrimary),
+          if (isSelected) Icon(Icons.check_rounded, size: kTileIconSize, color: context.colors.primaryFixed),
         ],
       ),
     ),

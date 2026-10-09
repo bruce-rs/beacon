@@ -38,14 +38,14 @@ void main() {
       await tester.pumpWidget(testApp(const SettingsPage()));
       await tester.pump();
 
-      expect(find.text('Appearance'), findsOneWidget);
+      expect(find.text('APPEARANCE'), findsOneWidget);
     });
 
     testWidgets('renders Language section', (tester) async {
       await tester.pumpWidget(testApp(const SettingsPage()));
       await tester.pump();
 
-      expect(find.text('Language'), findsOneWidget);
+      expect(find.text('LANGUAGE'), findsOneWidget);
     });
   });
 
@@ -169,8 +169,9 @@ void main() {
     testWidgets('renders the About section', (tester) async {
       await openSettingsAtAbout(tester);
 
-      // Section label plus the tile label.
-      expect(find.text('About'), findsNWidgets(2));
+      // The section caption renders upper case; the tile keeps title case.
+      expect(find.text('ABOUT'), findsOneWidget);
+      expect(find.text('About'), findsOneWidget);
       expect(find.text('App description and version'), findsOneWidget);
     });
 

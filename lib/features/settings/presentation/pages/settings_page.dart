@@ -131,7 +131,12 @@ class SettingsPage extends BasePage<SettingsController> {
             dialogContext.tr.about_version('${info.version} (${info.buildNumber})'),
             style: dialogContext.texts.bodySmall?.copyWith(color: dialogContext.colors.onSurfaceVariant),
           ),
-          TextButton(onPressed: () => dialogContext.maybePop(), child: Text(dialogContext.tr.about_close)),
+          // Navigator, not the router: the dialog lives in the root overlay,
+          // which sits above AutoRouter, so `maybePop` finds no router there.
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(dialogContext.tr.about_close),
+          ),
         ],
       ),
     );
@@ -250,9 +255,9 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Text(
-    text,
-    style: context.texts.labelMedium?.copyWith(
-      color: context.colors.onPrimary,
+    text.toUpperCase(),
+    style: context.texts.labelSmall?.copyWith(
+      color: context.colors.onSurfaceVariant,
       fontWeight: FontWeight.bold,
       letterSpacing: 0.8,
     ),
