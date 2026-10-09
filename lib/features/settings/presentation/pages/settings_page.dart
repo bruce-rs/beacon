@@ -3,12 +3,17 @@ import 'package:beacon/base/enums/app_locales.dart';
 import 'package:beacon/base/enums/theme_mode_ext.dart';
 import 'package:beacon/base/extensions/context_ext.dart';
 import 'package:beacon/base/presentation/pages/base_page.dart';
+import 'package:beacon/base/presentation/widgets/info_tile.dart';
+import 'package:beacon/base/presentation/widgets/navigation_tile.dart';
+import 'package:beacon/base/presentation/widgets/option_card.dart';
+import 'package:beacon/base/presentation/widgets/option_tile.dart';
 import 'package:beacon/base/utils/app_bottom_sheet.dart';
 import 'package:beacon/features/home/presentation/controllers/home_controller.dart';
 import 'package:beacon/features/home/presentation/widgets/status_indicator.dart';
 import 'package:beacon/features/settings/presentation/controllers/settings_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 @RoutePage()
 class SettingsPage extends BasePage<SettingsController> {
@@ -28,28 +33,22 @@ class SettingsPage extends BasePage<SettingsController> {
         children: [
           _SectionLabel(context.tr.status),
           const SizedBox(height: 8),
-          _OptionCard(
+          OptionCard(
             children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                child: Row(
-                  children: [
-                    Icon(Icons.wifi_tethering_rounded, size: 20, color: context.colors.onSurfaceVariant),
-                    const SizedBox(width: 14),
-                    Expanded(child: Text(context.tr.app_name, style: context.texts.bodyMedium)),
-                    StatusIndicator(status: HomeController.to.status.value, showLabel: true),
-                  ],
-                ),
+              InfoTile(
+                icon: Icons.wifi_tethering_rounded,
+                label: context.tr.app_name,
+                trailing: StatusIndicator(status: HomeController.to.status.value, showLabel: true),
               ),
             ],
           ),
           const SizedBox(height: 20),
           _SectionLabel(context.tr.appearance),
           const SizedBox(height: 8),
-          _OptionCard(
+          OptionCard(
             children: [
               ...ThemeMode.values.map(
-                (mode) => _OptionTile(
+                (mode) => OptionTile(
                   label: mode.labelIcon(context).$1,
                   icon: mode.labelIcon(context).$2,
                   isFirst: mode == ThemeMode.values.first,
@@ -63,10 +62,10 @@ class SettingsPage extends BasePage<SettingsController> {
           const SizedBox(height: 20),
           _SectionLabel(context.tr.language),
           const SizedBox(height: 8),
-          _OptionCard(
+          OptionCard(
             children: [
               ...AppLocale.values.map(
-                (locale) => _OptionTile(
+                (locale) => OptionTile(
                   label: locale.displayLabel(context),
                   icon: Icons.language_outlined,
                   isFirst: locale == AppLocale.values.first,
@@ -80,16 +79,66 @@ class SettingsPage extends BasePage<SettingsController> {
           const SizedBox(height: 20),
           _SectionLabel(context.tr.privacy_policy),
           const SizedBox(height: 8),
-          _OptionCard(children: [_PrivacyPolicyTile(onTap: () => _showPrivacyPolicy(context))]),
+          OptionCard(
+            children: [
+              NavigationTile(
+                icon: Icons.privacy_tip_outlined,
+                title: context.tr.privacy_policy,
+                subtitle: context.tr.privacy_policy_subtitle,
+                onTap: () => _showPrivacyPolicy(context),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
+          _SectionLabel(context.tr.about),
+          const SizedBox(height: 8),
+          OptionCard(
+            children: [
+              NavigationTile(
+                icon: Icons.info_outline_rounded,
+                title: context.tr.about,
+                subtitle: context.tr.about_subtitle,
+                onTap: () => _showAbout(context),
+              ),
+            ],
+          ),
         ],
       ),
     ),
   );
 
-  Future<void> _showPrivacyPolicy(BuildContext context) async => showAdaptiveBottomSheet<void>(
-    context: context,
-    builder: (sheetContext) => const _PrivacyPolicySheet(),
-  );
+  Future<void> _showAbout(BuildContext context) async {
+    final info = await PackageInfo.fromPlatform();
+    if (!context.mounted) return;
+
+    await showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        title: Row(
+          spacing: 10,
+          children: [
+            Padding(
+              padding: const EdgeInsetsDirectional.only(start: 10),
+              child: Icon(Icons.info_outline_rounded, color: dialogContext.colors.onSurfaceVariant),
+            ),
+            Text(dialogContext.tr.app_name),
+          ],
+        ),
+        content: Text(dialogContext.tr.about_description),
+        actionsAlignment: MainAxisAlignment.spaceBetween,
+        actions: [
+          Text(
+            dialogContext.tr.about_version('${info.version} (${info.buildNumber})'),
+            style: dialogContext.texts.bodySmall?.copyWith(color: dialogContext.colors.onSurfaceVariant),
+          ),
+          TextButton(onPressed: () => dialogContext.maybePop(), child: Text(dialogContext.tr.about_close)),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _showPrivacyPolicy(BuildContext context) async =>
+      showAdaptiveBottomSheet<void>(context: context, builder: (sheetContext) => const _PrivacyPolicySheet());
 }
 
 class _PrivacyPolicySheet extends StatelessWidget {
@@ -144,10 +193,7 @@ class _PrivacyPolicySheet extends StatelessWidget {
                     title: context.tr.privacy_policy_liability_title,
                     body: context.tr.privacy_policy_liability_body,
                   ),
-                  _PolicyItem(
-                    title: context.tr.privacy_policy_free_title,
-                    body: context.tr.privacy_policy_free_body,
-                  ),
+                  _PolicyItem(title: context.tr.privacy_policy_free_title, body: context.tr.privacy_policy_free_body),
                   _PolicyItem(
                     title: context.tr.privacy_policy_no_tracking_title,
                     body: context.tr.privacy_policy_no_tracking_body,
@@ -175,41 +221,8 @@ class _PrivacyPolicySheet extends StatelessWidget {
   );
 }
 
-class _PrivacyPolicyTile extends StatelessWidget {
-  const _PrivacyPolicyTile({required this.onTap});
-
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => InkWell(
-    onTap: onTap,
-    borderRadius: BorderRadius.circular(16),
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Row(
-        children: [
-          Icon(Icons.privacy_tip_outlined, size: 20, color: context.colors.onSurfaceVariant),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(context.tr.privacy_policy, style: context.texts.bodyMedium),
-                const SizedBox(height: 2),
-                Text(
-                  context.tr.privacy_policy_subtitle,
-                  style: context.texts.bodySmall?.copyWith(color: context.colors.onSurfaceVariant),
-                ),
-              ],
-            ),
-          ),
-          Icon(Icons.chevron_right_rounded, size: 20, color: context.colors.onSurfaceVariant),
-        ],
-      ),
-    ),
-  );
-}
-
+/// A tappable row that opens a detail view: leading icon, title, subtitle and a
+/// trailing chevron. Used for the Privacy Policy and About entries.
 class _PolicyItem extends StatelessWidget {
   const _PolicyItem({required this.title, required this.body, this.isLast = false});
 
@@ -242,58 +255,6 @@ class _SectionLabel extends StatelessWidget {
       color: context.colors.onPrimary,
       fontWeight: FontWeight.bold,
       letterSpacing: 0.8,
-    ),
-  );
-}
-
-class _OptionCard extends StatelessWidget {
-  const _OptionCard({required this.children});
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) => Card(
-    margin: EdgeInsets.zero,
-    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-    color: context.colors.surfaceContainer,
-    elevation: 0,
-    child: Column(children: children),
-  );
-}
-
-class _OptionTile extends StatelessWidget {
-  const _OptionTile({
-    required this.label,
-    required this.icon,
-    required this.isFirst,
-    required this.isLast,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  final String label;
-  final IconData icon;
-  final bool isFirst;
-  final bool isLast;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => InkWell(
-    onTap: onTap,
-    borderRadius: BorderRadius.vertical(
-      top: isFirst ? const Radius.circular(16) : Radius.zero,
-      bottom: isLast ? const Radius.circular(16) : Radius.zero,
-    ),
-    child: Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      child: Row(
-        children: [
-          Icon(icon, size: 20, color: context.colors.onSurfaceVariant),
-          const SizedBox(width: 14),
-          Expanded(child: Text(label, style: context.texts.bodyMedium)),
-          if (isSelected) Icon(Icons.check_rounded, size: 20, color: context.colors.onPrimary),
-        ],
-      ),
     ),
   );
 }

@@ -10,6 +10,7 @@ import 'package:beacon/features/beacon/services/beacon_service.dart';
 import 'package:beacon/gen/l10n/generated/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:beacon/features/home/presentation/controllers/home_controller.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences_platform_interface/in_memory_shared_preferences_async.dart';
 import 'package:shared_preferences_platform_interface/shared_preferences_async_platform_interface.dart';
@@ -76,6 +77,18 @@ AppController registerAppController() {
   ac.onInit();
   GetIt.I.registerSingleton<AppController>(ac);
   return ac;
+}
+
+/// Registers a [HomeController] over a [FakeBeaconService].
+///
+/// SettingsPage renders the status row from `HomeController.to`, so widget
+/// tests of that page need one registered.
+HomeController registerHomeController([FakeBeaconService? beacon]) {
+  final controller = HomeController(beacon ?? FakeBeaconService());
+  controller.onInit();
+  controller.isInitialized = true;
+  GetIt.I.registerSingleton<HomeController>(controller);
+  return controller;
 }
 
 // ── Widget wrapper ────────────────────────────────────────────────────────────

@@ -60,5 +60,17 @@
   "privacy_policy_no_tracking_title": "Sin seguimiento",
   "privacy_policy_no_tracking_body": "No recopilamos, rastreamos ni compartimos ningún dato personal, analítica ni información de uso.",
   "privacy_policy_no_storage_title": "No guardamos tus archivos",
-  "privacy_policy_no_storage_body": "No almacenamos tus archivos. Las transferencias van directamente entre tus dispositivos en la red local; nosotros no conservamos ninguna copia."
+  "privacy_policy_no_storage_body": "No almacenamos tus archivos. Las transferencias van directamente entre tus dispositivos en la red local; nosotros no conservamos ninguna copia.",
+  "about": "Acerca de",
+  "about_subtitle": "Descripción y versión de la app",
+  "about_description": "Beacon envía archivos directamente entre tus dispositivos a través de la red local. Nada sale de tu red ni se sube a un servidor.",
+  "about_version": "Versión {version}",
+  "@about_version": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "about_close": "Cerrar"
 }

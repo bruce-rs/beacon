@@ -138,4 +138,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get privacy_policy_no_storage_body =>
       'We do not store your files. Transfers go directly between your devices on the local network; no copy is kept by us.';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get about_subtitle => 'App description and version';
+
+  @override
+  String get about_description =>
+      'Beacon sends files straight between your own devices over the local network. Nothing leaves your network and nothing is uploaded to a server.';
+
+  @override
+  String about_version(String version) {
+    return 'Version $version';
+  }
+
+  @override
+  String get about_close => 'Close';
 }

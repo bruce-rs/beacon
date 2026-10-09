@@ -331,6 +331,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'We do not store your files. Transfers go directly between your devices on the local network; no copy is kept by us.'**
   String get privacy_policy_no_storage_body;
+
+  /// No description provided for @about.
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get about;
+
+  /// No description provided for @about_subtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'App description and version'**
+  String get about_subtitle;
+
+  /// No description provided for @about_description.
+  ///
+  /// In en, this message translates to:
+  /// **'Beacon sends files straight between your own devices over the local network. Nothing leaves your network and nothing is uploaded to a server.'**
+  String get about_description;
+
+  /// No description provided for @about_version.
+  ///
+  /// In en, this message translates to:
+  /// **'Version {version}'**
+  String about_version(String version);
+
+  /// No description provided for @about_close.
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get about_close;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

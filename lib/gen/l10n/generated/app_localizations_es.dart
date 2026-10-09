@@ -139,4 +139,22 @@ class AppLocalizationsEs extends AppLocalizations {
   @override
   String get privacy_policy_no_storage_body =>
       'No almacenamos tus archivos. Las transferencias van directamente entre tus dispositivos en la red local; nosotros no conservamos ninguna copia.';
+
+  @override
+  String get about => 'Acerca de';
+
+  @override
+  String get about_subtitle => 'Descripción y versión de la app';
+
+  @override
+  String get about_description =>
+      'Beacon envía archivos directamente entre tus dispositivos a través de la red local. Nada sale de tu red ni se sube a un servidor.';
+
+  @override
+  String about_version(String version) {
+    return 'Versión $version';
+  }
+
+  @override
+  String get about_close => 'Cerrar';
 }

@@ -60,5 +60,17 @@
   "privacy_policy_no_tracking_title": "No tracking",
   "privacy_policy_no_tracking_body": "We do not collect, track, or share any personal data, analytics, or usage information.",
   "privacy_policy_no_storage_title": "No file storage",
-  "privacy_policy_no_storage_body": "We do not store your files. Transfers go directly between your devices on the local network; no copy is kept by us."
+  "privacy_policy_no_storage_body": "We do not store your files. Transfers go directly between your devices on the local network; no copy is kept by us.",
+  "about": "About",
+  "about_subtitle": "App description and version",
+  "about_description": "Beacon sends files straight between your own devices over the local network. Nothing leaves your network and nothing is uploaded to a server.",
+  "about_version": "Version {version}",
+  "@about_version": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "about_close": "Close"
 }

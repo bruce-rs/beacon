@@ -5,16 +5,25 @@ import 'package:beacon/features/settings/presentation/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 import '../helpers/test_setup.dart';
 
 void main() {
   setUpAll(() async {
     await initTestStorage();
+    PackageInfo.setMockInitialValues(
+      appName: 'Beacon',
+      packageName: 'pub.brs.flbeacon',
+      version: '1.0.3',
+      buildNumber: '111',
+      buildSignature: '',
+    );
   });
 
   setUp(() {
     registerAppController();
+    registerHomeController();
     GetIt.I.registerLazySingleton<SettingsController>(() => SettingsController());
   });
 
@@ -142,6 +151,49 @@ void main() {
 
       // One for ThemeMode.system, one for AppLocale.enUS
       expect(find.byIcon(Icons.check_rounded), findsNWidgets(2));
+    });
+  });
+
+  // ── about ───────────────────────────────────────────────────────────────────
+
+  group('about', () {
+    // The section sits at the bottom of the list, past the default 800x600
+    // test viewport, so it has to be scrolled into view first.
+    Future<void> openSettingsAtAbout(WidgetTester tester) async {
+      await tester.pumpWidget(testApp(const SettingsPage()));
+      await tester.pump();
+      await tester.scrollUntilVisible(find.text('App description and version'), 200);
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('renders the About section', (tester) async {
+      await openSettingsAtAbout(tester);
+
+      // Section label plus the tile label.
+      expect(find.text('About'), findsNWidgets(2));
+      expect(find.text('App description and version'), findsOneWidget);
+    });
+
+    testWidgets('tapping it opens a dialog with description and version', (tester) async {
+      await openSettingsAtAbout(tester);
+
+      await tester.tap(find.text('App description and version'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsOneWidget);
+      expect(find.textContaining('sends files straight between your own devices'), findsOneWidget);
+      expect(find.text('Version 1.0.3 (111)'), findsOneWidget);
+    });
+
+    testWidgets('close dismisses the dialog', (tester) async {
+      await openSettingsAtAbout(tester);
+
+      await tester.tap(find.text('App description and version'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Close'));
+      await tester.pumpAndSettle();
+
+      expect(find.byType(AlertDialog), findsNothing);
     });
   });
 }
