@@ -1,7 +1,7 @@
 name: beacon
 description: "Share your files with your other devices."
 publish_to: "none"
-version: 1.2.0+120
+version: 2.0.1+201
 
 environment:
   sdk: ^3.11.1
@@ -19,7 +19,6 @@ dependencies:
   sqflite: ^2.4.4
   auto_route: ^11.1.0
   flutter_dotenv: ^6.0.1
-  google_fonts: ^8.2.1
   json_annotation: ^4.12.0
   shared_preferences: ^2.5.5
   get_it: ^9.2.1
@@ -70,3 +69,19 @@ flutter:
   uses-material-design: true
   assets:
     - assets/env/
+
+  # Bundled rather than fetched at runtime: a downloaded font falls back to the
+  # platform default on first launch (and offline), which is what shipped before.
+  fonts:
+    - family: Manrope
+      fonts:
+        - asset: assets/fonts/Manrope-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Manrope-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Manrope-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Manrope-Bold.ttf
+          weight: 700
+        - asset: assets/fonts/Manrope-ExtraBold.ttf
+          weight: 800

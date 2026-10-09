@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AppTextStyles {
   static TextTheme texTheme(TextTheme textTheme, ColorScheme colors) {
-    final baseTheme = GoogleFonts.robotoTextTheme(textTheme);
+    // Manrope ships in the bundle (see pubspec `fonts:`), so no network fetch
+    // and no silent fallback to the platform font.
+    final baseTheme = textTheme.apply(fontFamily: 'Manrope');
 
-    // Styles according to Material Design 3 Typography
+    // Material Design 3 roles, tuned for Beacon: heavier weights and tighter
+    // sizes than stock MD3, so a dense list still has a clear hierarchy.
     return baseTheme.copyWith(
       displayLarge: baseTheme.displayLarge?.copyWith(
         color: colors.onPrimary,
@@ -44,24 +46,24 @@ class AppTextStyles {
       ),
       headlineSmall: baseTheme.headlineSmall?.copyWith(
         color: colors.onSurface,
-        fontSize: 24,
-        fontWeight: FontWeight.w400,
-        height: 1.3,
-        letterSpacing: .0,
+        fontSize: 23,
+        fontWeight: FontWeight.w800,
+        height: 1.25,
+        letterSpacing: -.4,
       ),
       titleLarge: baseTheme.titleLarge?.copyWith(
         color: colors.onSurface,
-        fontSize: 22,
-        fontWeight: FontWeight.w400,
+        fontSize: 17,
+        fontWeight: FontWeight.w800,
         height: 1.3,
         letterSpacing: .0,
       ),
       titleMedium: baseTheme.titleMedium?.copyWith(
         color: colors.onSurface,
         fontSize: 16,
-        fontWeight: FontWeight.w500,
-        height: 1.5,
-        letterSpacing: 0.15,
+        fontWeight: FontWeight.w800,
+        height: 1.35,
+        letterSpacing: .0,
       ),
       titleSmall: baseTheme.titleSmall?.copyWith(
         color: colors.onSurface,
@@ -72,45 +74,45 @@ class AppTextStyles {
       ),
       bodyLarge: baseTheme.bodyLarge?.copyWith(
         color: colors.onSurface,
-        fontSize: 16,
-        fontWeight: FontWeight.w400,
-        height: 1.5,
-        letterSpacing: 0.5,
+        fontSize: 15,
+        fontWeight: FontWeight.w700,
+        height: 1.4,
+        letterSpacing: .0,
       ),
       bodyMedium: baseTheme.bodyMedium?.copyWith(
         color: colors.onSurface,
-        fontSize: 14,
-        fontWeight: FontWeight.w400,
-        height: 1.45,
-        letterSpacing: 0.25,
+        fontSize: 13.5,
+        fontWeight: FontWeight.w700,
+        height: 1.4,
+        letterSpacing: .0,
       ),
       bodySmall: baseTheme.bodySmall?.copyWith(
-        color: colors.onSurface,
-        fontSize: 12,
-        fontWeight: FontWeight.w400,
-        height: 1.3,
-        letterSpacing: 0.4,
+        color: colors.onSurfaceVariant,
+        fontSize: 12.5,
+        fontWeight: FontWeight.w600,
+        height: 1.45,
+        letterSpacing: .0,
       ),
       labelLarge: baseTheme.labelLarge?.copyWith(
         color: colors.onSurface,
-        fontSize: 14,
-        fontWeight: FontWeight.w500,
-        height: 1.45,
-        letterSpacing: 0.1,
+        fontSize: 14.5,
+        fontWeight: FontWeight.w700,
+        height: 1.4,
+        letterSpacing: .0,
       ),
       labelMedium: baseTheme.labelMedium?.copyWith(
         color: colors.onSurface,
         fontSize: 12,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w700,
         height: 1.3,
-        letterSpacing: 0.5,
+        letterSpacing: .0,
       ),
       labelSmall: baseTheme.labelSmall?.copyWith(
-        color: colors.onSurface,
+        color: colors.onSurfaceVariant,
         fontSize: 11,
-        fontWeight: FontWeight.w500,
+        fontWeight: FontWeight.w800,
         height: 1.3,
-        letterSpacing: 0.5,
+        letterSpacing: 1.4,
       ),
     );
   }
