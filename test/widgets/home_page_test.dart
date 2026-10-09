@@ -7,6 +7,13 @@ import 'package:get_it/get_it.dart';
 
 import '../helpers/test_setup.dart';
 
+/// The scanning placeholder animates forever, so `pumpAndSettle` would never
+/// return. Two frames are enough for a stream event to reach the UI.
+Future<void> settle(WidgetTester tester) async {
+  await tester.pump();
+  await tester.pump(const Duration(milliseconds: 20));
+}
+
 void main() {
   late FakeBeaconService beacon;
 
@@ -30,7 +37,7 @@ void main() {
   group('device section', () {
     testWidgets('shows searching text when no devices found', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       expect(find.text('NEARBY DEVICES'), findsOneWidget);
       expect(find.text('Searching for devices on your network…'), findsOneWidget);
@@ -38,10 +45,10 @@ void main() {
 
     testWidgets('shows device card when a device is discovered', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       beacon.emitDevices([makeDevice(name: 'iPhone 16')]);
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       expect(find.text('iPhone 16'), findsOneWidget);
       expect(find.text('Searching for devices on your network…'), findsNothing);
@@ -49,10 +56,10 @@ void main() {
 
     testWidgets('shows multiple device cards', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       beacon.emitDevices([makeDevice(id: 'a', name: 'MacBook'), makeDevice(id: 'b', name: 'iPad')]);
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       expect(find.text('MacBook'), findsOneWidget);
       expect(find.text('iPad'), findsOneWidget);
@@ -60,14 +67,14 @@ void main() {
 
     testWidgets('returns to searching text when all devices lost', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       beacon.emitDevices([makeDevice(name: 'Mac')]);
-      await tester.pumpAndSettle();
+      await settle(tester);
       expect(find.text('Mac'), findsOneWidget);
 
       beacon.emitDevices([]);
-      await tester.pumpAndSettle();
+      await settle(tester);
       expect(find.text('Searching for devices on your network…'), findsOneWidget);
     });
   });
@@ -77,37 +84,37 @@ void main() {
   group('drop zone', () {
     testWidgets('shows inactive label when no device selected', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       expect(find.text('Select a device above to send files'), findsOneWidget);
     });
 
     testWidgets('changes label after selecting a device', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       beacon.emitDevices([makeDevice(name: 'MacBook')]);
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       await tester.tap(find.text('MacBook'));
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       expect(find.text('Select a device above to send files'), findsNothing);
     });
 
     testWidgets('restores inactive label when device deselected', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       beacon.emitDevices([makeDevice(name: 'MacBook')]);
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       // Select
       await tester.tap(find.text('MacBook'));
-      await tester.pumpAndSettle();
+      await settle(tester);
       // Deselect (tap same)
       await tester.tap(find.text('MacBook'));
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       expect(find.text('Select a device above to send files'), findsOneWidget);
     });
@@ -118,24 +125,24 @@ void main() {
   group('transfers section', () {
     testWidgets('does not show transfers header when list is empty', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       expect(find.text('TRANSFERS'), findsNothing);
     });
 
     testWidgets('shows transfers header when a transfer arrives', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       beacon.emitTransfer(makeTransfer());
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       expect(find.text('TRANSFERS'), findsOneWidget);
     });
 
     testWidgets('shows transfer filename', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       beacon.emitTransfer(
         FileTransfer(
@@ -146,19 +153,19 @@ void main() {
           deviceName: 'iPhone',
         ),
       );
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       expect(find.text('report.pdf'), findsOneWidget);
     });
 
     testWidgets('shows multiple transfers', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       beacon.emitTransfer(makeTransfer(id: 'tx-1'));
-      await tester.pumpAndSettle();
+      await settle(tester);
       beacon.emitTransfer(makeTransfer(id: 'tx-2'));
-      await tester.pumpAndSettle();
+      await settle(tester);
 
       final ctrl = GetIt.I<HomeController>();
       expect(ctrl.transfers.length, 2);

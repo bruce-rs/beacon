@@ -2,6 +2,7 @@ import 'package:beacon/base/extensions/context_ext.dart';
 import 'package:beacon/base/utils/app_bottom_sheet.dart';
 import 'package:beacon/features/beacon/data/models/file_transfer.dart';
 import 'package:beacon/features/home/presentation/controllers/home_controller.dart';
+import 'package:beacon/features/home/presentation/widgets/transfer_actions_sheet.dart';
 import 'package:flutter/material.dart';
 
 class TransferTile extends StatelessWidget {
@@ -19,27 +20,19 @@ class TransferTile extends StatelessWidget {
       context: context,
       minHeight: 600,
       showDragHandle: true,
-      builder: (sheetContext) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(24, 0, 24, 12),
-              child: Text(transfer.filename, style: sheetContext.texts.titleMedium, overflow: TextOverflow.ellipsis),
-            ),
-            ListTile(
-              leading: const Icon(Icons.folder_open_outlined),
-              title: Text(sheetContext.tr.open_folder),
-              onTap: () async {
-                Navigator.of(sheetContext).pop();
-                final ok = await HomeController.to.openTransferLocation(transfer);
-                if (!ok && context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tr.open_folder_failed)));
-                }
-              },
-            ),
-          ],
-        ),
+      builder: (sheetContext) => TransferActionsSheet(
+        transfer: transfer,
+        onOpenFolder: () async {
+          Navigator.of(sheetContext).pop();
+          final ok = await HomeController.to.openTransferLocation(transfer);
+          if (!ok && context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tr.open_folder_failed)));
+          }
+        },
+        onRemove: () {
+          Navigator.of(sheetContext).pop();
+          HomeController.to.removeTransfer(transfer);
+        },
       ),
     );
   }

@@ -183,6 +183,9 @@ class HomeController extends BaseController with WidgetsBindingObserver {
 
   Future<bool> openTransferLocation(FileTransfer transfer) => _beacon.openSaveLocation(transfer);
 
+  /// Removes the row from the list only; the file on disk is left alone.
+  void removeTransfer(FileTransfer transfer) => transfers.removeWhere((t) => t.id == transfer.id);
+
   Future<void> pickAndSendFiles() async {
     final device = _liveSelection;
     if (device == null) {

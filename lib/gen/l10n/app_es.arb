@@ -118,5 +118,7 @@
         "type": "String"
       }
     }
-  }
+  },
+  "remove_from_list": "Quitar de la lista",
+  "saved_in": "Guardado en"
 }
