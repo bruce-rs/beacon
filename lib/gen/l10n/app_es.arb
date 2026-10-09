@@ -72,5 +72,51 @@
       }
     }
   },
-  "about_close": "Cerrar"
+  "about_close": "Cerrar",
+  "device_selected": "Seleccionado",
+  "device_tap_to_select": "Toca para elegir",
+  "looking_for_devices": "Buscando dispositivos",
+  "send_to": "Enviar a {name}",
+  "@send_to": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "drop_zone_hint_tap": "Toca para elegir archivos",
+  "drop_zone_hint_drop": "Suelta archivos aquí, o toca para elegir",
+  "drop_zone_hint_release": "Suelta para enviar",
+  "transfer_sending_to": "Enviando a {name}",
+  "@transfer_sending_to": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "transfer_sent_to": "Enviado a {name}",
+  "@transfer_sent_to": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "transfer_receiving_from": "Recibiendo de {name}",
+  "@transfer_receiving_from": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "transfer_received_from": "Recibido de {name}",
+  "@transfer_received_from": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

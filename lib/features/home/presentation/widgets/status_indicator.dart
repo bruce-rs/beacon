@@ -3,16 +3,19 @@ import 'package:beacon/features/beacon/services/beacon_service.dart';
 import 'package:flutter/material.dart';
 
 class StatusIndicator extends StatelessWidget {
-  const StatusIndicator({super.key, required this.status, this.showLabel = false});
+  const StatusIndicator({super.key, required this.status, this.showLabel = false, this.asPill = false});
 
   final BeaconStatus status;
   final bool showLabel;
 
+  /// Wraps the dot and label in a tinted pill, for use in the app bar.
+  final bool asPill;
+
   Color _color(BuildContext context) => switch (status) {
-    BeaconStatus.running => Colors.green.shade500,
+    BeaconStatus.running => context.colorsExt.success ?? Colors.green.shade500,
     BeaconStatus.starting => Colors.amber.shade600,
     BeaconStatus.error => context.colors.error,
-    BeaconStatus.stopped => context.colors.outlineVariant,
+    BeaconStatus.stopped => context.colors.onSurfaceVariant,
   };
 
   String _label(BuildContext context) => switch (status) {
@@ -40,13 +43,27 @@ class StatusIndicator extends StatelessWidget {
 
     if (!showLabel) return dot;
 
-    return Row(
+    final row = Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        dot,
+        asPill ? SizedBox.square(dimension: 7, child: dot) : dot,
         const SizedBox(width: 8),
-        Text(_label(context), style: context.texts.bodyMedium),
+        Text(
+          _label(context),
+          style: asPill ? context.texts.labelMedium?.copyWith(color: color) : context.texts.bodyMedium,
+        ),
       ],
+    );
+
+    if (!asPill) return row;
+
+    return Container(
+      padding: const EdgeInsets.fromLTRB(9, 6, 12, 6),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.16),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: row,
     );
   }
 }

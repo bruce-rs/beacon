@@ -1,9 +1,13 @@
 import 'package:beacon/base/extensions/context_ext.dart';
 import 'package:beacon/features/beacon/data/models/beacon_device.dart';
+import 'package:beacon/features/home/presentation/widgets/device_avatar.dart';
 import 'package:flutter/material.dart';
 
 class DeviceCard extends StatelessWidget {
   const DeviceCard({super.key, required this.device, required this.isSelected, required this.onTap});
+
+  static const double width = 172;
+  static const double height = 112;
 
   final BeaconDevice device;
   final bool isSelected;
@@ -11,35 +15,49 @@ class DeviceCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Selection is a filled card rather than a thin border: on a list of grey
+    // cards an outline alone is easy to miss.
+    final background = isSelected ? context.colors.primaryContainer : context.colors.surfaceContainer;
+    final border = isSelected ? context.colors.primaryFixed : context.colors.outlineVariant;
+
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        width: 88,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        width: width,
+        height: height,
+        padding: const EdgeInsets.all(13),
         decoration: BoxDecoration(
-          color: isSelected ? context.colors.primaryFixed.withValues(alpha: 0.12) : context.colors.primaryContainer,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? context.colors.primaryFixed : context.colors.outline,
-            width: isSelected ? 2 : 1,
-          ),
+          color: background,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: border, width: 1.5),
         ),
         child: Column(
-          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Icon(
-              Icons.computer_outlined,
-              size: 28,
-              color: isSelected ? context.colors.primaryFixed : context.colors.onSurface,
+            Row(
+              children: [
+                DeviceAvatar(device: device),
+                const Spacer(),
+                if (isSelected) Icon(Icons.check_rounded, size: 18, color: context.colors.primaryFixedDim),
+              ],
             ),
-            const SizedBox(height: 6),
-            Text(
-              device.name,
-              style: context.texts.labelSmall,
-              overflow: TextOverflow.ellipsis,
-              textAlign: TextAlign.center,
-              maxLines: 2,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(device.name, style: context.texts.bodyMedium, maxLines: 1, overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 2),
+                Text(
+                  isSelected ? context.tr.device_selected : context.tr.device_tap_to_select,
+                  style: isSelected
+                      ? context.texts.bodySmall?.copyWith(color: context.colors.primaryFixedDim)
+                      : context.texts.bodySmall,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
             ),
           ],
         ),

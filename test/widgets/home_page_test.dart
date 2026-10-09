@@ -30,18 +30,18 @@ void main() {
   group('device section', () {
     testWidgets('shows searching text when no devices found', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
-      expect(find.text('Nearby Devices'), findsOneWidget);
+      expect(find.text('NEARBY DEVICES'), findsOneWidget);
       expect(find.text('Searching for devices on your network…'), findsOneWidget);
     });
 
     testWidgets('shows device card when a device is discovered', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       beacon.emitDevices([makeDevice(name: 'iPhone 16')]);
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('iPhone 16'), findsOneWidget);
       expect(find.text('Searching for devices on your network…'), findsNothing);
@@ -49,10 +49,10 @@ void main() {
 
     testWidgets('shows multiple device cards', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       beacon.emitDevices([makeDevice(id: 'a', name: 'MacBook'), makeDevice(id: 'b', name: 'iPad')]);
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('MacBook'), findsOneWidget);
       expect(find.text('iPad'), findsOneWidget);
@@ -60,14 +60,14 @@ void main() {
 
     testWidgets('returns to searching text when all devices lost', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       beacon.emitDevices([makeDevice(name: 'Mac')]);
-      await tester.pump();
+      await tester.pumpAndSettle();
       expect(find.text('Mac'), findsOneWidget);
 
       beacon.emitDevices([]);
-      await tester.pump();
+      await tester.pumpAndSettle();
       expect(find.text('Searching for devices on your network…'), findsOneWidget);
     });
   });
@@ -77,37 +77,37 @@ void main() {
   group('drop zone', () {
     testWidgets('shows inactive label when no device selected', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('Select a device above to send files'), findsOneWidget);
     });
 
     testWidgets('changes label after selecting a device', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       beacon.emitDevices([makeDevice(name: 'MacBook')]);
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       await tester.tap(find.text('MacBook'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('Select a device above to send files'), findsNothing);
     });
 
     testWidgets('restores inactive label when device deselected', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       beacon.emitDevices([makeDevice(name: 'MacBook')]);
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       // Select
       await tester.tap(find.text('MacBook'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       // Deselect (tap same)
       await tester.tap(find.text('MacBook'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('Select a device above to send files'), findsOneWidget);
     });
@@ -118,24 +118,24 @@ void main() {
   group('transfers section', () {
     testWidgets('does not show transfers header when list is empty', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
-      expect(find.text('Transfers'), findsNothing);
+      expect(find.text('TRANSFERS'), findsNothing);
     });
 
     testWidgets('shows transfers header when a transfer arrives', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       beacon.emitTransfer(makeTransfer());
-      await tester.pump();
+      await tester.pumpAndSettle();
 
-      expect(find.text('Transfers'), findsOneWidget);
+      expect(find.text('TRANSFERS'), findsOneWidget);
     });
 
     testWidgets('shows transfer filename', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       beacon.emitTransfer(
         FileTransfer(
@@ -146,19 +146,19 @@ void main() {
           deviceName: 'iPhone',
         ),
       );
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       expect(find.text('report.pdf'), findsOneWidget);
     });
 
     testWidgets('shows multiple transfers', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       beacon.emitTransfer(makeTransfer(id: 'tx-1'));
-      await tester.pump();
+      await tester.pumpAndSettle();
       beacon.emitTransfer(makeTransfer(id: 'tx-2'));
-      await tester.pump();
+      await tester.pumpAndSettle();
 
       final ctrl = GetIt.I<HomeController>();
       expect(ctrl.transfers.length, 2);

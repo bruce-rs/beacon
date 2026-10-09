@@ -72,5 +72,51 @@
       }
     }
   },
-  "about_close": "Close"
+  "about_close": "Close",
+  "device_selected": "Selected",
+  "device_tap_to_select": "Tap to select",
+  "looking_for_devices": "Looking for devices",
+  "send_to": "Send to {name}",
+  "@send_to": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "drop_zone_hint_tap": "Tap to pick files",
+  "drop_zone_hint_drop": "Drop files here, or tap to pick",
+  "drop_zone_hint_release": "Release to send",
+  "transfer_sending_to": "Sending to {name}",
+  "@transfer_sending_to": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "transfer_sent_to": "Sent to {name}",
+  "@transfer_sent_to": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "transfer_receiving_from": "Receiving from {name}",
+  "@transfer_receiving_from": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "transfer_received_from": "Received from {name}",
+  "@transfer_received_from": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  }
 }

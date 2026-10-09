@@ -61,57 +61,67 @@ class _DropZoneWidgetState extends State<DropZoneWidget> {
   Widget _buildContent(BuildContext context) {
     final active = widget.isActive;
     final hovering = _hovering && active;
+    final name = widget.selectedDeviceName ?? '';
 
-    final String label;
+    final String title;
+    final String? hint;
     final IconData icon;
 
     if (!active) {
-      label = context.tr.drop_zone_select_device;
-      icon = Icons.upload_file_outlined;
-    } else if (_isMobile) {
-      label = context.tr.drop_zone_tap_to_pick(widget.selectedDeviceName ?? '');
-      icon = Icons.folder_open_outlined;
+      title = context.tr.drop_zone_select_device;
+      hint = null;
+      icon = Icons.file_upload_outlined;
     } else if (hovering) {
-      label = context.tr.drop_zone_release_to_send(widget.selectedDeviceName ?? '');
+      title = context.tr.drop_zone_hint_release;
+      hint = context.tr.send_to(name);
       icon = Icons.file_download_outlined;
     } else {
-      label = context.tr.drop_zone_drop_files(widget.selectedDeviceName ?? '');
-      icon = Icons.upload_file_outlined;
+      title = context.tr.send_to(name);
+      hint = _isMobile ? context.tr.drop_zone_hint_tap : context.tr.drop_zone_hint_drop;
+      icon = Icons.file_upload_outlined;
     }
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 150),
       width: double.infinity,
-      height: 148,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 22),
       decoration: BoxDecoration(
-        color: hovering
-            ? context.colors.primaryFixed.withValues(alpha: 0.08)
-            : context.colors.primaryContainer.withValues(alpha: 0.5),
-        borderRadius: BorderRadius.circular(16),
+        // Inactive is a dashed-looking inset; selected fills with the accent
+        // tint so the state change is visible without reading the label.
+        color: active ? context.colors.primaryContainer : context.colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(
           color: hovering
               ? context.colors.primaryFixed
               : active
-              ? context.colors.primaryFixed.withValues(alpha: 0.4)
-              : context.colors.outline,
+              ? context.colors.primaryFixed.withValues(alpha: 0.55)
+              : context.colors.outlineVariant,
           width: hovering ? 2 : 1.5,
         ),
       ),
-      child: Center(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon, size: 36, color: active ? context.colors.primaryFixed : context.colors.outlineVariant),
-            const SizedBox(height: 10),
-            Text(
-              label,
-              style: context.texts.bodyMedium?.copyWith(
-                color: active ? context.colors.onSurface : context.colors.outlineVariant,
-              ),
-              textAlign: TextAlign.center,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 58,
+            height: 58,
+            decoration: BoxDecoration(
+              color: active ? context.colors.primaryFixed : context.colors.surfaceContainerHigh,
+              borderRadius: BorderRadius.circular(20),
             ),
+            child: Icon(icon, size: 26, color: active ? context.colors.onPrimary : context.colors.onSurfaceVariant),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            title,
+            style: active ? context.texts.titleMedium : context.texts.bodyLarge?.copyWith(color: context.colors.onSurfaceVariant),
+            textAlign: TextAlign.center,
+          ),
+          if (hint != null) ...[
+            const SizedBox(height: 4),
+            Text(hint, style: context.texts.bodySmall, textAlign: TextAlign.center),
           ],
-        ),
+        ],
       ),
     );
   }
