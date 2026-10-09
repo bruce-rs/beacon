@@ -123,11 +123,22 @@ void main() {
   // ── transfers section ──────────────────────────────────────────────────────
 
   group('transfers section', () {
-    testWidgets('does not show transfers header when list is empty', (tester) async {
+    testWidgets('shows the empty state when the list is empty', (tester) async {
       await tester.pumpWidget(testApp(const HomePage()));
       await settle(tester);
 
-      expect(find.text('TRANSFERS'), findsNothing);
+      expect(find.text('TRANSFERS'), findsOneWidget);
+      expect(find.text('No transfers yet'), findsOneWidget);
+    });
+
+    testWidgets('empty state goes away once a transfer arrives', (tester) async {
+      await tester.pumpWidget(testApp(const HomePage()));
+      await settle(tester);
+
+      beacon.emitTransfer(makeTransfer());
+      await settle(tester);
+
+      expect(find.text('No transfers yet'), findsNothing);
     });
 
     testWidgets('shows transfers header when a transfer arrives', (tester) async {

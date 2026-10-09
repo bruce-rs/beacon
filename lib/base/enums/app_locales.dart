@@ -17,7 +17,7 @@ enum AppLocale {
   };
 
   String displayLabel(BuildContext context) => switch (this) {
-    AppLocale.enUS => '$flag  ${context.tr.lang_en}',
-    AppLocale.esES => '$flag  ${context.tr.lang_es}',
+    AppLocale.enUS => context.tr.lang_en,
+    AppLocale.esES => context.tr.lang_es,
   };
 }

@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:beacon/base/extensions/context_ext.dart';
+import 'package:beacon/base/presentation/widgets/sheet_action_button.dart';
 import 'package:beacon/base/utils/env.dart';
 import 'package:beacon/features/beacon/data/models/file_transfer.dart';
 import 'package:flutter/material.dart';
@@ -125,60 +126,16 @@ class TransferActionsSheet extends StatelessWidget {
             const SizedBox(height: 20),
 
             // ── Actions ───────────────────────────────────────────────
-            _SheetAction(
+            SheetActionButton(
               icon: Icons.folder_open_outlined,
               label: context.tr.open_folder,
               isPrimary: true,
+              showChevron: true,
               onTap: onOpenFolder,
             ),
             const SizedBox(height: 10),
-            _SheetAction(icon: Icons.playlist_remove_rounded, label: context.tr.remove_from_list, onTap: onRemove),
+            SheetActionButton(icon: Icons.playlist_remove_rounded, label: context.tr.remove_from_list, onTap: onRemove),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _SheetAction extends StatelessWidget {
-  const _SheetAction({required this.icon, required this.label, required this.onTap, this.isPrimary = false});
-
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-  final bool isPrimary;
-
-  @override
-  Widget build(BuildContext context) {
-    final background = isPrimary ? context.colors.primaryFixed : context.colors.surfaceContainerHigh;
-    final foreground = isPrimary ? context.colors.onPrimary : context.colors.onSurface;
-
-    return Material(
-      color: background,
-      borderRadius: BorderRadius.circular(18),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              Container(
-                width: 34,
-                height: 34,
-                decoration: BoxDecoration(
-                  color: isPrimary
-                      ? context.colors.onPrimary.withValues(alpha: 0.18)
-                      : context.colors.surfaceContainer,
-                  borderRadius: BorderRadius.circular(11),
-                ),
-                child: Icon(icon, size: 18, color: foreground),
-              ),
-              const SizedBox(width: 13),
-              Expanded(child: Text(label, style: context.texts.bodyLarge?.copyWith(color: foreground))),
-              if (isPrimary) Icon(Icons.chevron_right_rounded, size: 20, color: foreground),
-            ],
-          ),
         ),
       ),
     );

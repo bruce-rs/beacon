@@ -42,6 +42,7 @@ class BeaconService with LoggerMixin {
   nsd.Registration? _registration;
   String? _localServiceName;
   String? _localDeviceId;
+  String? _localDisplayName;
 
   int _idCounter = 0;
   String _nextId() => '${DateTime.now().millisecondsSinceEpoch}_${_idCounter++}';
@@ -68,6 +69,9 @@ class BeaconService with LoggerMixin {
   Stream<BeaconStatus> get statusStream => _statusController.stream;
   List<BeaconDevice> get devices => List.unmodifiable(_devices);
   BeaconStatus get status => _status;
+
+  /// The name this device advertises to peers, or null while stopped.
+  String? get localName => _localDisplayName;
 
   int get port => _server?.port ?? 0;
 
@@ -107,6 +111,7 @@ class BeaconService with LoggerMixin {
       // the display name and a stable device id in TXT records keeps both the
       // name shown to users and the device identity free of that suffix.
       _localDeviceId = deviceId;
+      _localDisplayName = deviceName;
       _registration = await nsd.register(
         nsd.Service(
           name: requested,
@@ -192,6 +197,7 @@ class BeaconService with LoggerMixin {
     _server = null;
     _localServiceName = null;
     _localDeviceId = null;
+    _localDisplayName = null;
     _localAddresses.clear();
     _devices.clear();
     _devicesController.add(const []);

@@ -8,6 +8,7 @@ class AppColorExtension extends ThemeExtension<AppColorExtension> {
     required this.onSuccessContainer,
     required this.deviceTeal,
     required this.deviceViolet,
+    required this.warning,
   });
 
   final Color? success;
@@ -19,6 +20,9 @@ class AppColorExtension extends ThemeExtension<AppColorExtension> {
   final Color? deviceTeal;
   final Color? deviceViolet;
 
+  /// In-between states: starting up, degraded.
+  final Color? warning;
+
   @override
   ThemeExtension<AppColorExtension> copyWith({
     Color? success,
@@ -27,6 +31,7 @@ class AppColorExtension extends ThemeExtension<AppColorExtension> {
     Color? onSuccessContainer,
     Color? deviceTeal,
     Color? deviceViolet,
+    Color? warning,
   }) {
     return AppColorExtension(
       success: success ?? this.success,
@@ -35,6 +40,7 @@ class AppColorExtension extends ThemeExtension<AppColorExtension> {
       onSuccessContainer: onSuccessContainer ?? this.onSuccessContainer,
       deviceTeal: deviceTeal ?? this.deviceTeal,
       deviceViolet: deviceViolet ?? this.deviceViolet,
+      warning: warning ?? this.warning,
     );
   }
 
@@ -49,6 +55,7 @@ class AppColorExtension extends ThemeExtension<AppColorExtension> {
       onSuccessContainer: Color.lerp(onSuccessContainer, other.onSuccessContainer, t),
       deviceTeal: Color.lerp(deviceTeal, other.deviceTeal, t),
       deviceViolet: Color.lerp(deviceViolet, other.deviceViolet, t),
+      warning: Color.lerp(warning, other.warning, t),
     );
   }
 }

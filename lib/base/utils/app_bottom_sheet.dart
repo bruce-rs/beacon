@@ -28,7 +28,18 @@ Future<T?> showAdaptiveBottomSheet<T>({
           color: backgroundColor ?? context.colors.surface,
           child: Align(
             alignment: Alignment.topCenter,
-            child: ConstrainedBox(constraints: BoxConstraints(maxWidth: maxWidth), child: builder(context)),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: maxWidth),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // A Cupertino sheet draws no handle of its own, so add the
+                  // same grab bar Material gives us; it dismisses by swiping.
+                  if (showDragHandle) const _CupertinoSheetHandle(),
+                  Flexible(child: builder(context)),
+                ],
+              ),
+            ),
           ),
         );
         return widgetBuilder(context);
@@ -56,6 +67,23 @@ Future<T?> showAdaptiveBottomSheet<T>({
     builder: (context) => ConstrainedBox(
       constraints: BoxConstraints(minHeight: effectiveMinHeight, maxHeight: maxHeight),
       child: Padding(padding: context.viewInsets, child: builder(context)),
+    ),
+  );
+}
+
+class _CupertinoSheetHandle extends StatelessWidget {
+  const _CupertinoSheetHandle();
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.only(top: 12, bottom: 4),
+    child: Container(
+      width: 42,
+      height: 4,
+      decoration: BoxDecoration(
+        color: context.colors.onSurfaceVariant.withValues(alpha: 0.4),
+        borderRadius: BorderRadius.circular(999),
+      ),
     ),
   );
 }

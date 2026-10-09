@@ -24,6 +24,9 @@ class HomeController extends BaseController with WidgetsBindingObserver {
   final selectedDevice = Rx<BeaconDevice?>(null);
   final status = Rx<BeaconStatus>(BeaconStatus.stopped);
 
+  /// The name peers see for this device; null until the beacon is running.
+  final localName = Rxn<String>();
+
   @override
   void onInit() {
     super.onInit();
@@ -62,6 +65,7 @@ class HomeController extends BaseController with WidgetsBindingObserver {
   Future<void> _startBeacon() async {
     try {
       await _beacon.start(await _localName, deviceId: await _stableDeviceId);
+      localName.value = _beacon.localName;
     } catch (err) {
       showError('Beacon failed to start: $err');
     }

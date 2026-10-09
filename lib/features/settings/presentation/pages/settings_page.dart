@@ -7,7 +7,10 @@ import 'package:beacon/base/presentation/widgets/info_tile.dart';
 import 'package:beacon/base/presentation/widgets/navigation_tile.dart';
 import 'package:beacon/base/presentation/widgets/option_card.dart';
 import 'package:beacon/base/presentation/widgets/option_tile.dart';
+import 'package:beacon/base/presentation/widgets/segmented_option_tile.dart';
+import 'package:beacon/base/presentation/widgets/sheet_action_button.dart';
 import 'package:beacon/base/utils/app_bottom_sheet.dart';
+import 'package:beacon/features/beacon/services/beacon_service.dart';
 import 'package:beacon/features/home/presentation/controllers/home_controller.dart';
 import 'package:beacon/features/home/presentation/widgets/status_indicator.dart';
 import 'package:beacon/features/settings/presentation/controllers/settings_controller.dart';
@@ -37,8 +40,10 @@ class SettingsPage extends BasePage<SettingsController> {
             children: [
               InfoTile(
                 icon: Icons.wifi_tethering_rounded,
-                label: context.tr.app_name,
-                trailing: StatusIndicator(status: HomeController.to.status.value, showLabel: true),
+                iconTint: _statusTint(context, HomeController.to.status.value),
+                label: _statusTitle(context, HomeController.to.status.value),
+                subtitle: _statusSubtitle(context, HomeController.to.status.value, HomeController.to.localName.value),
+                trailing: StatusIndicator(status: HomeController.to.status.value),
               ),
             ],
           ),
@@ -47,15 +52,16 @@ class SettingsPage extends BasePage<SettingsController> {
           const SizedBox(height: 8),
           OptionCard(
             children: [
-              ...ThemeMode.values.map(
-                (mode) => OptionTile(
-                  label: mode.labelIcon(context).$1,
-                  icon: mode.labelIcon(context).$2,
-                  isFirst: mode == ThemeMode.values.first,
-                  isLast: mode == ThemeMode.values.last,
-                  isSelected: controller.app.appTheme == mode,
-                  onTap: () => controller.setTheme(mode),
-                ),
+              SegmentedOptionTile(
+                options: [
+                  for (final mode in ThemeMode.values)
+                    SegmentedOption(
+                      label: mode.labelIcon(context).$1,
+                      icon: mode.labelIcon(context).$2,
+                      isSelected: controller.app.appTheme == mode,
+                      onTap: () => controller.setTheme(mode),
+                    ),
+                ],
               ),
             ],
           ),
@@ -67,7 +73,7 @@ class SettingsPage extends BasePage<SettingsController> {
               ...AppLocale.values.map(
                 (locale) => OptionTile(
                   label: locale.displayLabel(context),
-                  icon: Icons.language_outlined,
+                  badge: locale.langCode.toUpperCase(),
                   isFirst: locale == AppLocale.values.first,
                   isLast: locale == AppLocale.values.last,
                   isSelected: controller.app.appLocale == locale,
@@ -77,25 +83,18 @@ class SettingsPage extends BasePage<SettingsController> {
             ],
           ),
           const SizedBox(height: 20),
-          _SectionLabel(context.tr.privacy_policy),
-          const SizedBox(height: 8),
           OptionCard(
             children: [
               NavigationTile(
                 icon: Icons.privacy_tip_outlined,
+                iconTint: context.colorsExt.deviceTeal,
                 title: context.tr.privacy_policy,
                 subtitle: context.tr.privacy_policy_subtitle,
                 onTap: () => _showPrivacyPolicy(context),
               ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          _SectionLabel(context.tr.about),
-          const SizedBox(height: 8),
-          OptionCard(
-            children: [
               NavigationTile(
                 icon: Icons.info_outline_rounded,
+                iconTint: context.colors.primaryFixed,
                 title: context.tr.about,
                 subtitle: context.tr.about_subtitle,
                 onTap: () => _showAbout(context),
@@ -107,6 +106,26 @@ class SettingsPage extends BasePage<SettingsController> {
     ),
   );
 
+  String _statusTitle(BuildContext context, BeaconStatus status) => switch (status) {
+    BeaconStatus.running => context.tr.status_title_running,
+    BeaconStatus.starting => context.tr.status_title_starting,
+    BeaconStatus.stopped => context.tr.status_title_stopped,
+    BeaconStatus.error => context.tr.status_title_error,
+  };
+
+  /// The advertised name once running; otherwise why peers can't see us.
+  String _statusSubtitle(BuildContext context, BeaconStatus status, String? name) =>
+      status == BeaconStatus.running && name != null
+      ? context.tr.status_visible_as(name)
+      : context.tr.status_not_visible;
+
+  Color _statusTint(BuildContext context, BeaconStatus status) => switch (status) {
+    BeaconStatus.running => context.colorsExt.success ?? context.colors.primaryFixed,
+    BeaconStatus.starting => context.colors.primaryFixed,
+    BeaconStatus.stopped => context.colors.onSurfaceVariant,
+    BeaconStatus.error => context.colors.error,
+  };
+
   Future<void> _showAbout(BuildContext context) async {
     final info = await PackageInfo.fromPlatform();
     if (!context.mounted) return;
@@ -114,36 +133,80 @@ class SettingsPage extends BasePage<SettingsController> {
     await showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        title: Row(
-          spacing: 10,
+        contentPadding: const EdgeInsets.fromLTRB(24, 28, 24, 10),
+        actionsPadding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Padding(
-              padding: const EdgeInsetsDirectional.only(start: 10),
-              child: Icon(Icons.info_outline_rounded, color: dialogContext.colors.onSurfaceVariant),
+            Container(
+              width: 66,
+              height: 66,
+              decoration: BoxDecoration(
+                color: dialogContext.colors.primaryFixed,
+                borderRadius: BorderRadius.circular(22),
+              ),
+              child: Icon(Icons.sensors_rounded, size: 30, color: dialogContext.colors.onPrimary),
             ),
-            Text(dialogContext.tr.app_name),
+            const SizedBox(height: 18),
+            Text(dialogContext.tr.app_name, style: dialogContext.texts.headlineSmall),
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              decoration: BoxDecoration(
+                color: dialogContext.colors.surfaceContainerHigh,
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Text(
+                dialogContext.tr.about_version('${info.version} (${info.buildNumber})'),
+                style: dialogContext.texts.labelMedium?.copyWith(color: dialogContext.colors.onSurfaceVariant),
+              ),
+            ),
+            const SizedBox(height: 18),
+            Text(dialogContext.tr.about_description, style: dialogContext.texts.bodySmall, textAlign: TextAlign.center),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                _AboutBadge(
+                  icon: Icons.shield_outlined,
+                  label: dialogContext.tr.about_no_tracking,
+                  tint: dialogContext.colorsExt.success ?? dialogContext.colors.primaryFixed,
+                ),
+                const SizedBox(width: 10),
+                _AboutBadge(
+                  icon: Icons.wifi_tethering_rounded,
+                  label: dialogContext.tr.about_local_only,
+                  tint: dialogContext.colorsExt.deviceTeal ?? dialogContext.colors.primaryFixed,
+                ),
+                const SizedBox(width: 10),
+                _AboutBadge(
+                  icon: Icons.favorite_outline_rounded,
+                  label: dialogContext.tr.about_free,
+                  tint: dialogContext.colorsExt.deviceViolet ?? dialogContext.colors.primaryFixed,
+                ),
+              ],
+            ),
           ],
         ),
-        content: Text(dialogContext.tr.about_description),
-        actionsAlignment: MainAxisAlignment.spaceBetween,
         actions: [
-          Text(
-            dialogContext.tr.about_version('${info.version} (${info.buildNumber})'),
-            style: dialogContext.texts.bodySmall?.copyWith(color: dialogContext.colors.onSurfaceVariant),
-          ),
           // Navigator, not the router: the dialog lives in the root overlay,
           // which sits above AutoRouter, so `maybePop` finds no router there.
-          TextButton(
-            onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(dialogContext.tr.about_close),
+          SizedBox(
+            width: double.infinity,
+            child: SheetActionButton(
+              label: dialogContext.tr.about_close,
+              onTap: () => Navigator.of(dialogContext).pop(),
+            ),
           ),
         ],
       ),
     );
   }
 
-  Future<void> _showPrivacyPolicy(BuildContext context) async =>
-      showAdaptiveBottomSheet<void>(context: context, builder: (sheetContext) => const _PrivacyPolicySheet());
+  Future<void> _showPrivacyPolicy(BuildContext context) async => showAdaptiveBottomSheet<void>(
+    context: context,
+    showDragHandle: true,
+    builder: (sheetContext) => const _PrivacyPolicySheet(),
+  );
 }
 
 class _PrivacyPolicySheet extends StatelessWidget {
@@ -153,35 +216,41 @@ class _PrivacyPolicySheet extends StatelessWidget {
   Widget build(BuildContext context) => SafeArea(
     top: false,
     child: Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 20),
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 20),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Center(
-            child: Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(
-                color: context.colors.onSurfaceVariant.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-          ),
           Row(
             children: [
-              Icon(Icons.privacy_tip_outlined, size: 22, color: context.colors.onSurface),
-              const SizedBox(width: 10),
+              Container(
+                width: 52,
+                height: 52,
+                decoration: BoxDecoration(
+                  color: (context.colorsExt.deviceTeal ?? context.colors.primaryFixed).withValues(alpha: 0.16),
+                  borderRadius: BorderRadius.circular(17),
+                ),
+                child: Icon(
+                  Icons.privacy_tip_outlined,
+                  size: 24,
+                  color: context.colorsExt.deviceTeal ?? context.colors.primaryFixed,
+                ),
+              ),
+              const SizedBox(width: 13),
               Expanded(
-                child: Text(
-                  context.tr.privacy_policy,
-                  style: context.texts.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(context.tr.privacy_policy, style: context.texts.titleLarge),
+                    const SizedBox(height: 4),
+                    Text(context.tr.privacy_policy_subtitle, style: context.texts.bodySmall),
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 18),
           Flexible(
             child: SingleChildScrollView(
               child: Column(
@@ -213,12 +282,9 @@ class _PrivacyPolicySheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          SizedBox(
-            width: double.infinity,
-            child: FilledButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text(context.tr.privacy_policy_close),
-            ),
+          SheetActionButton(
+            label: context.tr.privacy_policy_close,
+            onTap: () => Navigator.of(context).pop(),
           ),
         ],
       ),
@@ -237,14 +303,22 @@ class _PolicyItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-    padding: EdgeInsets.only(bottom: isLast ? 0 : 14),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(title, style: context.texts.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
-        const SizedBox(height: 4),
-        Text(body, style: context.texts.bodyMedium),
-      ],
+    padding: EdgeInsets.only(bottom: isLast ? 0 : 10),
+    child: Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: context.colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: context.texts.bodyLarge),
+          const SizedBox(height: 4),
+          Text(body, style: context.texts.bodySmall),
+        ],
+      ),
     ),
   );
 }
@@ -260,6 +334,34 @@ class _SectionLabel extends StatelessWidget {
       color: context.colors.onSurfaceVariant,
       fontWeight: FontWeight.bold,
       letterSpacing: 0.8,
+    ),
+  );
+}
+
+/// One of the three reassurances in the About dialog.
+class _AboutBadge extends StatelessWidget {
+  const _AboutBadge({required this.icon, required this.label, required this.tint});
+
+  final IconData icon;
+  final String label;
+  final Color tint;
+
+  @override
+  Widget build(BuildContext context) => Expanded(
+    child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 13),
+      decoration: BoxDecoration(
+        color: context.colors.surfaceContainerLow,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 19, color: tint),
+          const SizedBox(height: 7),
+          Text(label, style: context.texts.labelSmall, textAlign: TextAlign.center),
+        ],
+      ),
     ),
   );
 }

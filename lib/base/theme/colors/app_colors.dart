@@ -115,6 +115,7 @@ class AppColors {
     onSuccessContainer: Color(0xFF2A6B35),
     deviceTeal: tealLight,
     deviceViolet: violetLight,
+    warning: Color(0xFFB4690E),
   );
 
   static AppColorExtension get darkColorExt => const AppColorExtension(
@@ -124,6 +125,7 @@ class AppColors {
     onSuccessContainer: Color(0xFF8FD694),
     deviceTeal: tealDark,
     deviceViolet: violetDark,
+    warning: Color(0xFFE0A33A),
   );
 
   static ColorScheme colorScheme(Brightness brightness) => switch (brightness) {

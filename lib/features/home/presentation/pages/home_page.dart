@@ -7,6 +7,7 @@ import 'package:beacon/features/home/presentation/widgets/drop_zone_widget.dart'
 import 'package:beacon/features/home/presentation/widgets/scanning_placeholder.dart';
 import 'package:beacon/features/home/presentation/widgets/status_indicator.dart';
 import 'package:beacon/features/home/presentation/widgets/transfer_tile.dart';
+import 'package:beacon/features/home/presentation/widgets/transfers_empty_state.dart';
 import 'package:beacon/features/settings/presentation/pages/settings_page.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -75,17 +76,17 @@ class HomePage extends BasePage<HomeController> {
             const SizedBox(height: 24),
 
             // ── Transfers ──────────────────────────────────────────────
-            if (controller.transfers.isNotEmpty) ...[
-              _SectionLabel(context.tr.transfers),
-              Expanded(
-                child: ListView.separated(
-                  padding: EdgeInsets.zero,
-                  itemCount: controller.transfers.length,
-                  separatorBuilder: (_, _) => Divider(height: 1, color: context.colors.outlineVariant),
-                  itemBuilder: (_, i) => TransferTile(transfer: controller.transfers[i]),
-                ),
-              ),
-            ],
+            _SectionLabel(context.tr.transfers),
+            Expanded(
+              child: controller.transfers.isEmpty
+                  ? const TransfersEmptyState()
+                  : ListView.separated(
+                      padding: EdgeInsets.zero,
+                      itemCount: controller.transfers.length,
+                      separatorBuilder: (_, _) => Divider(height: 1, color: context.colors.outlineVariant),
+                      itemBuilder: (_, i) => TransferTile(transfer: controller.transfers[i]),
+                    ),
+            ),
           ],
         ),
       ),

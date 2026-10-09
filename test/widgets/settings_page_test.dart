@@ -89,15 +89,15 @@ void main() {
       expect(GetIt.I<AppController>().appTheme, ThemeMode.dark);
     });
 
-    testWidgets('after changing theme, check icon count remains 2', (tester) async {
+    testWidgets('after changing theme, the language check is still the only one', (tester) async {
       await tester.pumpWidget(testApp(const SettingsPage()));
       await tester.pump();
 
       await tester.tap(find.text('Light'));
       await tester.pumpAndSettle();
 
-      // One check for theme (Light), one check for language (English default)
-      expect(find.byIcon(Icons.check_rounded), findsNWidgets(2));
+      // The theme picker is a segmented row, so only the language list checks.
+      expect(find.byIcon(Icons.check_rounded), findsOneWidget);
     });
   });
 
@@ -149,8 +149,8 @@ void main() {
       await tester.pumpWidget(testApp(const SettingsPage()));
       await tester.pump();
 
-      // One for ThemeMode.system, one for AppLocale.enUS
-      expect(find.byIcon(Icons.check_rounded), findsNWidgets(2));
+      // Only AppLocale.enUS: the theme picker shows selection by fill instead.
+      expect(find.byIcon(Icons.check_rounded), findsOneWidget);
     });
   });
 
@@ -169,8 +169,7 @@ void main() {
     testWidgets('renders the About section', (tester) async {
       await openSettingsAtAbout(tester);
 
-      // The section caption renders upper case; the tile keeps title case.
-      expect(find.text('ABOUT'), findsOneWidget);
+      // Privacy and About share one card, so the row title stands alone.
       expect(find.text('About'), findsOneWidget);
       expect(find.text('App description and version'), findsOneWidget);
     });

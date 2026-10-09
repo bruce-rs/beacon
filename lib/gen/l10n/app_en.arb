@@ -120,5 +120,23 @@
     }
   },
   "remove_from_list": "Remove from list",
-  "saved_in": "Saved in"
+  "saved_in": "Saved in",
+  "status_title_running": "Beacon is online",
+  "status_title_starting": "Beacon is starting",
+  "status_title_stopped": "Beacon is offline",
+  "status_title_error": "Beacon couldn't start",
+  "status_visible_as": "Visible as “{name}” on this network",
+  "@status_visible_as": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "status_not_visible": "Not visible to other devices",
+  "about_no_tracking": "No tracking",
+  "about_local_only": "Local only",
+  "about_free": "Free, no ads",
+  "no_transfers_title": "No transfers yet",
+  "no_transfers_hint": "Files you send or receive show up here, with their progress."
 }

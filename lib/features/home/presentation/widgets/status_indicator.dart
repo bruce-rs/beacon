@@ -12,8 +12,8 @@ class StatusIndicator extends StatelessWidget {
   final bool asPill;
 
   Color _color(BuildContext context) => switch (status) {
-    BeaconStatus.running => context.colorsExt.success ?? Colors.green.shade500,
-    BeaconStatus.starting => Colors.amber.shade600,
+    BeaconStatus.running => context.colorsExt.success ?? context.colors.primaryFixed,
+    BeaconStatus.starting => context.colorsExt.warning ?? context.colors.primaryFixed,
     BeaconStatus.error => context.colors.error,
     BeaconStatus.stopped => context.colors.onSurfaceVariant,
   };

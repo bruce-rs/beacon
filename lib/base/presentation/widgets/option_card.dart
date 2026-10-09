@@ -22,7 +22,15 @@ class OptionCard extends StatelessWidget {
     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(kCardRadius)),
     color: context.colors.surfaceContainer,
     elevation: 0,
-    child: Column(children: children),
+    child: Column(
+      children: [
+        for (final child in children) ...[
+          child,
+          if (child != children.last)
+            Divider(height: 1, thickness: 1, indent: 65, color: context.colors.outlineVariant),
+        ],
+      ],
+    ),
   );
 }
 

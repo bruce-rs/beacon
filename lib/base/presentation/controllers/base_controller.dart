@@ -44,8 +44,14 @@ abstract class BaseController extends GetxController with LoggerMixin {
 
   void showError(String message, {BuildContext? context}) {
     log('Error: $message', name: _effectiveTag);
-    ScaffoldMessenger.of(
-      context ?? AppRouter.to.appContext,
-    ).showSnackBar(SnackBar(content: Text(message), backgroundColor: Colors.red));
+    final ctx = context ?? AppRouter.to.appContext;
+    final colors = Theme.of(ctx).colorScheme;
+
+    ScaffoldMessenger.of(ctx).showSnackBar(
+      SnackBar(
+        content: Text(message, style: TextStyle(color: colors.onError)),
+        backgroundColor: colors.error,
+      ),
+    );
   }
 }
