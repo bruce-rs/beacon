@@ -526,31 +526,38 @@ class BeaconService with LoggerMixin {
     return addresses.isNotEmpty ? addresses.first : null;
   }
 
-  /// Reveals the folder where a received file was saved in the OS file browser.
+  /// Opens the folder received files are saved to, in the OS file browser.
   ///
-  /// - iOS: opens Files.app at the app's Documents/Beacon folder (requires
+  /// - iOS: Files.app at the app's Documents/Beacon folder (requires
   ///   `UIFileSharingEnabled` + `LSSupportsOpeningDocumentsInPlace`).
-  /// - Android: opens Download/Beacon in the system Files app via a platform
-  ///   channel (see MainActivity.kt), falling back to the MediaStore entry
-  ///   for the received file.
-  /// - Desktop: opens the save folder in the OS file manager.
-  Future<bool> openSaveLocation(FileTransfer transfer) async {
+  /// - Android: Download/Beacon through a platform channel (MainActivity.kt).
+  /// - Desktop: the save folder in the OS file manager.
+  Future<bool> openSaveFolder() async {
     try {
-      if (Platform.isIOS) {
-        final dir = await _saveDirectory();
-        final uri = Uri(scheme: 'shareddocuments', path: dir.path);
-        return await launchUrl(uri);
-      }
       if (Platform.isAndroid) {
-        final opened = await _filesChannel.invokeMethod<bool>('openDownloadsFolder', {'folder': Env.folderName});
-        if (opened == true) return true;
-        if (transfer.savedUri == null) return false;
-        return await launchUrl(Uri.parse(transfer.savedUri!), mode: LaunchMode.externalApplication);
+        return await _filesChannel.invokeMethod<bool>('openDownloadsFolder', {'folder': Env.folderName}) ?? false;
       }
+
       final dir = await _saveDirectory();
-      return await launchUrl(Uri.file(dir.path));
+      final uri = Platform.isIOS ? Uri(scheme: 'shareddocuments', path: dir.path) : Uri.file(dir.path);
+      return await launchUrl(uri);
     } catch (err, st) {
-      e('openSaveLocation failed', error: err, stackTrace: st);
+      e('openSaveFolder failed', error: err, stackTrace: st);
+      return false;
+    }
+  }
+
+  /// As [openSaveFolder], but falls back to the file's own MediaStore entry on
+  /// Android when the folder itself can't be opened.
+  Future<bool> openSaveLocation(FileTransfer transfer) async {
+    if (await openSaveFolder()) return true;
+
+    try {
+      final savedUri = transfer.savedUri;
+      if (!Platform.isAndroid || savedUri == null) return false;
+      return await launchUrl(Uri.parse(savedUri), mode: LaunchMode.externalApplication);
+    } catch (err, st) {
+      e('openSaveLocation fallback failed', error: err, stackTrace: st);
       return false;
     }
   }

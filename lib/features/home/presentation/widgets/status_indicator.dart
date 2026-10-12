@@ -59,10 +59,7 @@ class StatusIndicator extends StatelessWidget {
 
     return Container(
       padding: const EdgeInsets.fromLTRB(9, 6, 12, 6),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.16),
-        borderRadius: BorderRadius.circular(999),
-      ),
+      decoration: BoxDecoration(color: color.withValues(alpha: 0.16), borderRadius: BorderRadius.circular(999)),
       child: row,
     );
   }

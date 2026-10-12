@@ -5,14 +5,7 @@ import 'package:flutter/material.dart';
 /// A read-only row: leading icon, label and an optional trailing widget such as
 /// a status indicator.
 class InfoTile extends OptionCardTile {
-  const InfoTile({
-    super.key,
-    required this.icon,
-    required this.label,
-    this.subtitle,
-    this.trailing,
-    this.iconTint,
-  });
+  const InfoTile({super.key, required this.icon, required this.label, this.subtitle, this.trailing, this.iconTint});
 
   final IconData icon;
   final String label;
@@ -43,10 +36,7 @@ class InfoTile extends OptionCardTile {
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(label, style: context.texts.bodyMedium),
-              if (subtitle case final text?) ...[
-                const SizedBox(height: 2),
-                Text(text, style: context.texts.bodySmall),
-              ],
+              if (subtitle case final text?) ...[const SizedBox(height: 2), Text(text, style: context.texts.bodySmall)],
             ],
           ),
         ),

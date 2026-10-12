@@ -35,57 +35,119 @@ class HomePage extends BasePage<HomeController> {
       ],
     ),
     body: Obx(
-      () => Padding(
-        padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // ── Devices ────────────────────────────────────────────────
-            _SectionLabel(context.tr.nearby_devices),
-            const SizedBox(height: 12),
-            if (controller.devices.isEmpty)
-              const ScanningPlaceholder()
-            else
-              SizedBox(
-                height: DeviceCard.height,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: controller.devices.length,
-                  separatorBuilder: (_, _) => const SizedBox(width: 10),
-                  itemBuilder: (_, i) {
-                    final device = controller.devices[i];
-                    return DeviceCard(
-                      device: device,
-                      isSelected: controller.selectedDevice.value?.id == device.id,
-                      onTap: () => controller.selectDevice(device),
-                    );
-                  },
+      () => CustomScrollView(
+        slivers: [
+          SliverPadding(
+            padding: const EdgeInsets.fromLTRB(16, 4, 16, 0),
+            sliver: SliverToBoxAdapter(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // ── Devices ────────────────────────────────────────
+                  _SectionLabel(context.tr.nearby_devices),
+                  const SizedBox(height: 12),
+                  if (controller.devices.isEmpty)
+                    const ScanningPlaceholder()
+                  else
+                    SizedBox(
+                      height: DeviceCard.height,
+                      child: ListView.separated(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: controller.devices.length,
+                        separatorBuilder: (_, _) => const SizedBox(width: 10),
+                        itemBuilder: (_, i) {
+                          final device = controller.devices[i];
+                          return DeviceCard(
+                            device: device,
+                            isSelected: controller.selectedDevice.value?.id == device.id,
+                            onTap: () => controller.selectDevice(device),
+                          );
+                        },
+                      ),
+                    ),
+
+                  const SizedBox(height: 22),
+
+                  // ── Drop zone ──────────────────────────────────────
+                  DropZoneWidget(
+                    isActive: controller.selectedDevice.value != null,
+                    selectedDeviceName: controller.selectedDevice.value?.name,
+                    onDropped: controller.sendFiles,
+                    onTap: controller.pickAndSendFiles,
+                  ),
+
+                  const SizedBox(height: 24),
+
+                  // ── Transfers ──────────────────────────────────────
+                  Row(
+                    children: [
+                      Expanded(child: _SectionLabel(context.tr.transfers)),
+                      _OpenFolderAction(onTap: () => _openFolder(context)),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (controller.transfers.isEmpty)
+            SliverLayoutBuilder(
+              builder: (context, constraints) => SliverToBoxAdapter(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.remainingPaintExtent),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: TransfersEmptyState(onOpenFolder: () => _openFolder(context)),
+                  ),
                 ),
               ),
-
-            const SizedBox(height: 22),
-
-            // ── Drop zone ──────────────────────────────────────────────
-            DropZoneWidget(
-              isActive: controller.selectedDevice.value != null,
-              selectedDeviceName: controller.selectedDevice.value?.name,
-              onDropped: controller.sendFiles,
-              onTap: controller.pickAndSendFiles,
+            )
+          else
+            SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              sliver: SliverList.separated(
+                itemCount: controller.transfers.length,
+                separatorBuilder: (_, _) => Divider(height: 1, color: context.colors.outlineVariant),
+                itemBuilder: (_, i) => TransferTile(transfer: controller.transfers[i]),
+              ),
             ),
+        ],
+      ),
+    ),
+  );
+}
 
-            const SizedBox(height: 24),
+/// Opens the folder received files are saved to, reporting failure the same
+/// way the transfer sheet does.
+Future<void> _openFolder(BuildContext context) async {
+  final ok = await HomeController.to.openSaveFolder();
+  if (!ok && context.mounted) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.tr.open_folder_failed)));
+  }
+}
 
-            // ── Transfers ──────────────────────────────────────────────
-            _SectionLabel(context.tr.transfers),
-            Expanded(
-              child: controller.transfers.isEmpty
-                  ? const TransfersEmptyState()
-                  : ListView.separated(
-                      padding: EdgeInsets.zero,
-                      itemCount: controller.transfers.length,
-                      separatorBuilder: (_, _) => Divider(height: 1, color: context.colors.outlineVariant),
-                      itemBuilder: (_, i) => TransferTile(transfer: controller.transfers[i]),
-                    ),
+/// The compact action beside the TRANSFERS caption.
+class _OpenFolderAction extends StatelessWidget {
+  const _OpenFolderAction({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Material(
+    color: Colors.transparent,
+    borderRadius: BorderRadius.circular(10),
+    child: InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(10),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.folder_open_outlined, size: 16, color: context.colors.primaryFixedDim),
+            const SizedBox(width: 6),
+            Text(
+              context.tr.open_beacon_folder,
+              style: context.texts.labelMedium?.copyWith(color: context.colors.primaryFixedDim),
             ),
           ],
         ),
@@ -94,7 +156,6 @@ class HomePage extends BasePage<HomeController> {
   );
 }
 
-/// An app-bar action on a rounded tile, matching the status pill beside it.
 class _AppBarIconButton extends StatelessWidget {
   const _AppBarIconButton({required this.icon, required this.tooltip, required this.onPressed});
 
@@ -111,10 +172,7 @@ class _AppBarIconButton extends StatelessWidget {
       child: InkWell(
         onTap: onPressed,
         borderRadius: BorderRadius.circular(12),
-        child: SizedBox.square(
-          dimension: 38,
-          child: Icon(icon, size: 20, color: context.colors.onSurfaceVariant),
-        ),
+        child: SizedBox.square(dimension: 38, child: Icon(icon, size: 20, color: context.colors.onSurfaceVariant)),
       ),
     ),
   );

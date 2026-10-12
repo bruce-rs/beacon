@@ -53,7 +53,9 @@ class SheetActionButton extends StatelessWidget {
                   child: Icon(data, size: 18, color: foreground),
                 ),
                 const SizedBox(width: 13),
-                Expanded(child: Text(label, style: context.texts.bodyLarge?.copyWith(color: foreground))),
+                Expanded(
+                  child: Text(label, style: context.texts.bodyLarge?.copyWith(color: foreground)),
+                ),
               ] else
                 Text(label, style: context.texts.bodyLarge?.copyWith(color: foreground)),
               if (showChevron) Icon(Icons.chevron_right_rounded, size: 20, color: foreground),

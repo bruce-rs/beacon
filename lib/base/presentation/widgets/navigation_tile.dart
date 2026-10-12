@@ -34,10 +34,7 @@ class NavigationTile extends OptionCardTile {
             Container(
               width: 36,
               height: 36,
-              decoration: BoxDecoration(
-                color: tint.withValues(alpha: 0.18),
-                borderRadius: BorderRadius.circular(12),
-              ),
+              decoration: BoxDecoration(color: tint.withValues(alpha: 0.18), borderRadius: BorderRadius.circular(12)),
               child: Icon(icon, size: kTileIconSize, color: tint),
             )
           else

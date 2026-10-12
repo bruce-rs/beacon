@@ -9,12 +9,7 @@ import 'package:path/path.dart' as p;
 
 /// Actions for a received file, shown from [TransferTile].
 class TransferActionsSheet extends StatelessWidget {
-  const TransferActionsSheet({
-    super.key,
-    required this.transfer,
-    required this.onOpenFolder,
-    required this.onRemove,
-  });
+  const TransferActionsSheet({super.key, required this.transfer, required this.onOpenFolder, required this.onRemove});
 
   final FileTransfer transfer;
   final VoidCallback onOpenFolder;

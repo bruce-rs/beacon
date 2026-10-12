@@ -138,5 +138,6 @@
   "about_local_only": "Local only",
   "about_free": "Free, no ads",
   "no_transfers_title": "No transfers yet",
-  "no_transfers_hint": "Files you send or receive show up here, with their progress."
+  "no_transfers_hint": "Files you send or receive show up here, with their progress.",
+  "open_beacon_folder": "Open folder"
 }

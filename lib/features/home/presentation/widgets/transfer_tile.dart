@@ -53,15 +53,8 @@ class TransferTile extends StatelessWidget {
           Container(
             width: 36,
             height: 36,
-            decoration: BoxDecoration(
-              color: accent.withValues(alpha: 0.16),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(
-              isSend ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded,
-              size: 18,
-              color: accent,
-            ),
+            decoration: BoxDecoration(color: accent.withValues(alpha: 0.16), borderRadius: BorderRadius.circular(12)),
+            child: Icon(isSend ? Icons.arrow_upward_rounded : Icons.arrow_downward_rounded, size: 18, color: accent),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -72,7 +65,9 @@ class TransferTile extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.baseline,
                   textBaseline: TextBaseline.alphabetic,
                   children: [
-                    Expanded(child: Text(transfer.filename, style: context.texts.bodyMedium, overflow: TextOverflow.ellipsis)),
+                    Expanded(
+                      child: Text(transfer.filename, style: context.texts.bodyMedium, overflow: TextOverflow.ellipsis),
+                    ),
                     const SizedBox(width: 8),
                     Text(
                       inProgress ? '${(transfer.progress * 100).round()}%' : transfer.formattedSize,

@@ -282,10 +282,7 @@ class _PrivacyPolicySheet extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 16),
-          SheetActionButton(
-            label: context.tr.privacy_policy_close,
-            onTap: () => Navigator.of(context).pop(),
-          ),
+          SheetActionButton(label: context.tr.privacy_policy_close, onTap: () => Navigator.of(context).pop()),
         ],
       ),
     ),
@@ -307,10 +304,7 @@ class _PolicyItem extends StatelessWidget {
     child: Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: context.colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: BoxDecoration(color: context.colors.surfaceContainerLow, borderRadius: BorderRadius.circular(16)),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -350,10 +344,7 @@ class _AboutBadge extends StatelessWidget {
   Widget build(BuildContext context) => Expanded(
     child: Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 13),
-      decoration: BoxDecoration(
-        color: context.colors.surfaceContainerLow,
-        borderRadius: BorderRadius.circular(16),
-      ),
+      decoration: BoxDecoration(color: context.colors.surfaceContainerLow, borderRadius: BorderRadius.circular(16)),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [

@@ -114,7 +114,9 @@ class _DropZoneWidgetState extends State<DropZoneWidget> {
           const SizedBox(height: 12),
           Text(
             title,
-            style: active ? context.texts.titleMedium : context.texts.bodyLarge?.copyWith(color: context.colors.onSurfaceVariant),
+            style: active
+                ? context.texts.titleMedium
+                : context.texts.bodyLarge?.copyWith(color: context.colors.onSurfaceVariant),
             textAlign: TextAlign.center,
           ),
           if (hint != null) ...[

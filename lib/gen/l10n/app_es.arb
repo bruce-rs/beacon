@@ -138,5 +138,6 @@
   "about_local_only": "Solo local",
   "about_free": "Gratis, sin anuncios",
   "no_transfers_title": "Aún no hay transferencias",
-  "no_transfers_hint": "Los archivos que envíes o recibas aparecerán aquí, con su progreso."
+  "no_transfers_hint": "Los archivos que envíes o recibas aparecerán aquí, con su progreso.",
+  "open_beacon_folder": "Abrir carpeta"
 }
