@@ -70,8 +70,6 @@ flutter:
   assets:
     - assets/env/
 
-  # Bundled rather than fetched at runtime: a downloaded font falls back to the
-  # platform default on first launch (and offline), which is what shipped before.
   fonts:
     - family: Manrope
       fonts:

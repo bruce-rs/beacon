@@ -6,6 +6,8 @@ A Flutter app for fast, local device-to-device file transfers over a shared Wi-F
 
 1. **Discovery** — On launch, Beacon registers itself as an mDNS service (`_beacon._tcp`) and scans for other devices running the app on the same network. Discovered devices appear in real time on the home screen.
 
+   The advertisement carries two TXT records: `n`, the display name (the system device name, e.g. `moto g06`), and `id`, a stable per-device identifier. Identity comes from those records rather than the mDNS instance name, which the OS renames on collision (`moto-g06 (2)`) when a record from a previous launch is still cached. This is what keeps names clean and stops one device appearing twice.
+
 2. **Select & send** — Pick a target device, then drop files onto the drop zone (desktop) or tap it to open the file picker (mobile). Files are sent one by one to the selected device.
 
 3. **Transfer protocol** — Beacon opens a direct TCP socket to the recipient and streams the file using a lightweight binary protocol:
@@ -34,7 +36,7 @@ The folder name (`Beacon`) is configurable via the `MEDIA_FOLDER_NAME` environme
 
 | Category              | Package / Technology                                                                |
 | --------------------- | ----------------------------------------------------------------------------------- |
-| Framework             | Flutter (Dart 3.11.1+)                                                              |
+| Framework             | Flutter 3.47+ (Dart 3.13+)                                                          |
 | Device discovery      | `nsd` — mDNS service registration & scanning                                        |
 | File transfer         | Custom TCP socket via `dart:io`                                                     |
 | File picking          | `file_picker`                                                                       |
@@ -45,7 +47,8 @@ The folder name (`Beacon`) is configurable via the `MEDIA_FOLDER_NAME` environme
 | Dependency injection  | `get_it` + `injectable`                                                             |
 | Navigation            | `auto_route`                                                                        |
 | Local storage         | `shared_preferences` (settings), `sqflite` (prepared for history)                   |
-| Theming & fonts       | `google_fonts`                                                                      |
+| Theming & fonts       | Manrope bundled in `assets/fonts/` (OFL), wired through `pubspec.yaml`              |
+| App version display   | `package_info_plus`                                                                 |
 | Localization          | `flutter_localizations` + `intl` (English, Spanish)                                 |
 | Config                | `flutter_dotenv` + `flutter_flavorizr` (dev / prod flavors)                         |
 | Code generation       | `build_runner`, `json_serializable`, `injectable_generator`, `auto_route_generator` |

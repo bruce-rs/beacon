@@ -1,6 +1,6 @@
 # Privacy Policy
 
-Effective date: April 29, 2026
+Effective date: October 11, 2026
 
 Beacon is a file sharing app that helps you transfer files directly between your own devices on the same local network.
 
@@ -16,13 +16,21 @@ When your device receives a file, Beacon saves that file locally on your device.
 
 ## Local Network Discovery
 
-Beacon uses local network discovery so nearby Beacon devices can find each other. To make this work, the app may advertise a local device name and a local network service on your network. Other Beacon devices on the same network may see this local device name, IP address, and connection port while the app is running.
+Beacon uses local network discovery so nearby Beacon devices can find each other. While the app is running, it advertises a local network service on your network. That advertisement includes:
+
+- A device name, taken from the name your system reports. On Android this is the device name you set in system settings, on iOS the device name or model, and on computers the computer name. It may therefore include a name you chose yourself, such as "Jon's Phone".
+- A device identifier that stays the same between app launches, so other Beacon devices recognise your device as the same one each time instead of listing it repeatedly.
+- The IP address and connection port your device is reachable at.
+
+Anything on your local network that looks for these advertisements can see this information, not only Beacon. This is how local network discovery works on every platform, and it is the same information other devices need in order to send you a file.
 
 This discovery is limited to the local network. Beacon does not send this information to a remote server.
 
 ## Device Information
 
-Beacon may read basic device information locally to create a friendly and stable device label for local network discovery. This may include the device hostname, operating system name, or a shortened platform device identifier. This information is used only on the device and for local discovery between Beacon devices.
+Beacon reads basic device information to build the device name and identifier described above. This may include the device name your system reports, the device model, the hostname, the operating system name, or a platform device identifier such as the vendor identifier on iOS.
+
+Beacon uses this information only to identify your device during local discovery, as described in that section. It is not sent to a remote server, and Beacon keeps no record of it beyond the running app.
 
 ## App Preferences
 
