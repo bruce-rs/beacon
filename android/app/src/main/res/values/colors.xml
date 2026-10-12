@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- The surface the app opens onto, so the splash doesn't flash a different
+         colour before the first frame. -->
+    <color name="launch_background">#F4F6F9</color>
+</resources>
