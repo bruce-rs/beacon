@@ -6,6 +6,7 @@ import 'dart:typed_data';
 import 'package:beacon/base/utils/env.dart';
 import 'package:beacon/features/beacon/data/models/beacon_device.dart';
 import 'package:beacon/features/beacon/data/models/file_transfer.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:injectable/injectable.dart';
@@ -247,6 +248,12 @@ class BeaconService with LoggerMixin {
     return false;
   }
 
+  /// The discovered device at [address], or the address itself when the sender
+  /// isn't in the device list — the wire protocol carries no sender name, so
+  /// without this every received file would be labelled by IP.
+  String _nameForAddress(String address) =>
+      _devices.firstWhereOrNull((d) => d.host == address)?.name ?? address;
+
   void _onServiceChanged(nsd.Service service, nsd.ServiceStatus status) {
     if (service.name == null || _isSelf(service)) return;
     // Prefer the advertised id/name so a device keeps one identity and a clean
@@ -317,7 +324,7 @@ class BeaconService with LoggerMixin {
         filename: filename,
         fileSize: fileSize,
         direction: TransferDirection.receive,
-        deviceName: socket.remoteAddress.address,
+        deviceName: _nameForAddress(socket.remoteAddress.address),
         status: TransferStatus.inProgress,
       );
       transfer = t;
