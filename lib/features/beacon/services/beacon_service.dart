@@ -546,6 +546,13 @@ class BeaconService with LoggerMixin {
       }
 
       final dir = await _saveDirectory();
+
+      // The sandbox refuses NSWorkspace.open() for the folder, so macOS reveals
+      // it in Finder through the same channel instead (MainFlutterWindow.swift).
+      if (Platform.isMacOS) {
+        return await _filesChannel.invokeMethod<bool>('revealFolder', {'path': dir.path}) ?? false;
+      }
+
       final uri = Platform.isIOS ? Uri(scheme: 'shareddocuments', path: dir.path) : Uri.file(dir.path);
       return await launchUrl(uri);
     } catch (err, st) {
