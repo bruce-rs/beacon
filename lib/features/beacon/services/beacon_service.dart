@@ -578,7 +578,7 @@ class BeaconService with LoggerMixin {
         log('Save directory: ${sub.path}');
         return sub;
       } catch (error) {
-        e('Could not use ${base.path}', error: error);
+        w('Could not use ${base.path}: $error');
         return null;
       }
     }
