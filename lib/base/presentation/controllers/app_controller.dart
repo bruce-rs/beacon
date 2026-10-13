@@ -2,6 +2,7 @@ import 'package:beacon/base/data/storage/app_storage.dart';
 import 'package:beacon/base/enums/app_locales.dart';
 import 'package:beacon/base/presentation/controllers/base_controller.dart';
 import 'package:beacon/base/router/app_router.dart';
+import 'package:beacon/features/settings/presentation/widgets/about_dialog.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -50,8 +51,11 @@ class AppController extends BaseController {
     if (defaultTargetPlatform != TargetPlatform.macOS) return;
 
     const MethodChannel('com.beacon/menu').setMethodCallHandler((call) async {
-      if (call.method == 'openSettings') {
-        AppRouter.to.navigate(const SettingsRoute());
+      switch (call.method) {
+        case 'openSettings':
+          AppRouter.to.navigate(const SettingsRoute());
+        case 'openAbout':
+          await showBeaconAboutDialog(AppRouter.to.appContext);
       }
     });
   }

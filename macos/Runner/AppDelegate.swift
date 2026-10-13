@@ -9,6 +9,10 @@ class AppDelegate: FlutterAppDelegate {
     AppDelegate.menuChannel?.invokeMethod("openSettings", arguments: nil)
   }
 
+  @objc func openAbout(_ sender: Any) {
+    AppDelegate.menuChannel?.invokeMethod("openAbout", arguments: nil)
+  }
+
   override func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
     return true
   }
